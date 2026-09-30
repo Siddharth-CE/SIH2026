@@ -17,9 +17,16 @@ def create_app(config_class=Config):
     db.init_app(app)
     login_manager.init_app(app)
 
-    # Ensure instance and upload directories exist
-    os.makedirs(os.path.join(app.root_path, 'instance'), exist_ok=True)
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    # Ensure instance and upload directories exist (safely ignoring read-only root in serverless)
+    try:
+        os.makedirs(os.path.join(app.root_path, 'instance'), exist_ok=True)
+    except OSError:
+        pass
+
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    except OSError:
+        pass
 
     # Register Blueprints
     app.register_blueprint(auth_bp)
@@ -50,9 +57,12 @@ def create_app(config_class=Config):
         db.session.rollback()
         return render_template('base.html'), 500
 
-    # Auto-initialize and seed database
+    # Auto-initialize and seed database safely
     with app.app_context():
-        seed_database()
+        try:
+            seed_database()
+        except Exception as e:
+            print(f"[GovPilot Warning] Auto-seeding encountered notice: {e}")
 
     return app
 

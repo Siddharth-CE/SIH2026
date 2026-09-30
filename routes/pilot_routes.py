@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from models import (
@@ -217,8 +217,11 @@ def upload_document(id):
 
     if file and file.filename:
         filename = secure_filename(file.filename)
-        upload_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'uploads')
-        os.makedirs(upload_dir, exist_ok=True)
+        upload_dir = current_app.config['UPLOAD_FOLDER']
+        try:
+            os.makedirs(upload_dir, exist_ok=True)
+        except OSError:
+            pass
         file_path = os.path.join(upload_dir, filename)
         file.save(file_path)
 
