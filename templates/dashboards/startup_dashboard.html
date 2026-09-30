@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Startup Portal Dashboard - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.startup_dashboard') }}">Home</a>
+      <span>/</span>
+      <span>Startup Portal</span>
+    </div>
+    <h1 class="page-title">Welcome back, {{ startup.name if startup else 'Startup Founder' }}</h1>
+    <p class="page-subtitle">{{ startup.product_name if startup else 'Innovation Dashboard' }} • {{ startup.trl_level if startup else 'TRL 7' }}</p>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    {% if startup %}
+    <a href="{{ url_for('startup.passport', id=startup.id) }}" class="btn btn-outline btn-sm">
+      View Innovation Passport
+    </a>
+    {% endif %}
+    <a href="{{ url_for('challenge.index') }}" class="btn btn-primary btn-sm">
+      Discover New Challenges
+    </a>
+  </div>
+</div>
+
+<!-- Active Pilots & Application Status -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+  <!-- My Active Pilots Card -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">My Pilot Sandboxes</span>
+      <span class="badge badge-success">{{ my_pilots|length }} Active</span>
+    </div>
+    <div class="gp-card-body">
+      {% if my_pilots %}
+        {% for p in my_pilots %}
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ p.code }}</span>
+              <h3 style="font-size: 16px; color: var(--primary); margin: 2px 0;">{{ p.title }}</h3>
+              <div style="font-size: 12.5px; color: var(--text-muted);">{{ p.department.name if p.department else 'Municipal Department' }}</div>
+            </div>
+            <span class="badge {{ p.get_status_badge_class() }}" style="font-size: 12px; padding: 4px 10px;">{{ p.status.replace('_', ' ').title() }}</span>
+          </div>
+
+          <div style="margin: 14px 0 10px;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Milestone Execution Progress</span>
+              <strong>{{ p.progress_percentage }}% Completed</strong>
+            </div>
+            <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+              <div style="width: {{ p.progress_percentage }}%; height: 100%; background: #15803d;"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); padding-top: 8px; border-top: 1px solid var(--border-color);">
+            <span>Budget: <strong>₹{{ "{:,.0f}".format(p.total_budget) }}</strong> (Disbursed: ₹{{ "{:,.0f}".format(p.disbursed_amount or 0) }})</span>
+            <a href="{{ url_for('pilot.passport', id=p.id) }}" class="btn btn-sm btn-primary">Open Passport →</a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+          No active pilots assigned. Apply to open challenges below to start a sandbox pilot.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Trust & Compliance Status Card -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Trust & Compliance</span>
+      <span class="badge badge-success">Verified</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 12.5px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+          <span>DPIIT Startup Recognition</span>
+          <strong style="color: var(--success);">✓ Verified</strong>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+          <span>ISO 27001 Cybersecurity</span>
+          <strong style="color: var(--success);">✓ Active</strong>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+          <span>Proprietary IP Clearance</span>
+          <strong style="color: var(--success);">✓ 100% Owned</strong>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+          <span>Data Localization</span>
+          <strong style="color: var(--success);">✓ Sovereign Cloud</strong>
+        </div>
+      </div>
+      {% if startup %}
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('startup.edit_passport') }}" class="btn btn-sm btn-outline" style="width: 100%;">Edit Passport Details</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Open Challenges Recommended for You -->
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Open Government Challenges Relevant to Your Stack</span>
+    <a href="{{ url_for('challenge.index') }}" style="font-size: 12px; color: var(--info);">Browse All Challenges →</a>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Challenge ID</th>
+          <th>Title</th>
+          <th>Department</th>
+          <th>Sector</th>
+          <th>Budget Envelope</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in open_challenges %}
+        <tr>
+          <td><code>{{ c.code }}</code></td>
+          <td><strong>{{ c.title }}</strong></td>
+          <td>{{ c.department.name if c.department else 'Government Department' }}</td>
+          <td>{{ c.sector }}</td>
+          <td>{{ c.budget_indicative }}</td>
+          <td>
+            <a href="{{ url_for('challenge.view', id=c.id) }}" class="btn btn-sm btn-outline">Review Scope & Apply →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

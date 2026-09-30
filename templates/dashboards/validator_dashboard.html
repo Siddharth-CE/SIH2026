@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Independent Validator Dashboard - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.validator_dashboard') }}">Home</a>
+      <span>/</span>
+      <span>Validator Portal</span>
+    </div>
+    <h1 class="page-title">Independent Technical Validation Cell</h1>
+    <p class="page-subtitle">{{ current_user.name }} • National Technical Audit Cell</p>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Active Pilots Under Technical Audit & Evidence Review</span>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Pilot Code</th>
+          <th>Pilot Title</th>
+          <th>Department</th>
+          <th>Partner Startup</th>
+          <th>Status</th>
+          <th>Validation Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pilots %}
+        <tr>
+          <td><code>{{ p.code }}</code></td>
+          <td><strong>{{ p.title }}</strong></td>
+          <td>{{ p.department.name if p.department else '—' }}</td>
+          <td>{{ p.startup.name if p.startup else '—' }}</td>
+          <td><span class="badge {{ p.get_status_badge_class() }}">{{ p.status.replace('_', ' ').title() }}</span></td>
+          <td>
+            <a href="{{ url_for('validation.create_report', pilot_id=p.id) }}" class="btn btn-sm btn-primary">
+              Inspect Evidence & Submit Report →
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

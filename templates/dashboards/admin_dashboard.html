@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}System Administration - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.admin_dashboard') }}">Home</a>
+      <span>/</span>
+      <span>Admin</span>
+    </div>
+    <h1 class="page-title">System Administration & Platform Health</h1>
+    <p class="page-subtitle">Platform Governance, Multi-Tenant Roles, and Tamper-Evident Audit</p>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('main.reset_demo') }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to re-seed demo data to default initial state?');">
+      ↺ Reset Demo Database
+    </a>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Registered Users</div>
+    <div class="kpi-value">{{ total_users }}</div>
+    <div class="kpi-subtext">5 Active Roles</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Departments</div>
+    <div class="kpi-value">{{ total_departments }}</div>
+    <div class="kpi-subtext">5 Municipal & State Bodies</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Startups</div>
+    <div class="kpi-value">{{ total_startups }}</div>
+    <div class="kpi-subtext">Passports Verified</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Challenges</div>
+    <div class="kpi-value">{{ total_challenges }}</div>
+    <div class="kpi-subtext">Outcome Blueprints</div>
+  </div>
+  <div class="kpi-card accent-scale">
+    <div class="kpi-label">Pilot Passports</div>
+    <div class="kpi-value">{{ total_pilots }}</div>
+    <div class="kpi-subtext">Active Sandboxes</div>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Recent System Audit Events (Immutable SQLite Log)</span>
+    <a href="{{ url_for('admin.audit_logs') }}" style="font-size: 12px; color: var(--info);">Open Full Audit Register →</a>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>User</th>
+          <th>Role</th>
+          <th>Action</th>
+          <th>Target Entity</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in recent_logs %}
+        <tr>
+          <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td><strong>{{ log.user_email }}</strong></td>
+          <td><span class="badge badge-gov">{{ log.user_role }}</span></td>
+          <td>{{ log.action }}</td>
+          <td><code>{{ log.entity_type }}: {{ log.entity_id or '' }}</code></td>
+          <td>{{ log.ip_address }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

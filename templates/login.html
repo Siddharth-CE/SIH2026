@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - GovPilot Innovation Procurement Platform{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 20px auto;">
+  <div class="gp-card" style="overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; min-height: 520px;">
+      
+      <!-- Left side: Login form -->
+      <div style="padding: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px;">
+          <div class="brand-logo" style="width: 32px; height: 32px; font-size: 15px;">GP</div>
+          <span style="font-weight: 700; font-size: 18px; color: var(--primary);">GovPilot Sign In</span>
+        </div>
+
+        <form action="{{ url_for('auth.login') }}" method="POST">
+          <div class="form-group">
+            <label class="form-label">Email Address <span class="required">*</span></label>
+            <input type="email" name="email" class="form-control" placeholder="name@govpilot.demo" required value="government@govpilot.demo">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password <span class="required">*</span></label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required value="Password123">
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <label style="font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" name="remember" checked> Remember session
+            </label>
+            <span style="font-size: 12px; color: var(--info);">Demo Sandbox</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 11px; font-size: 14px;">
+            Sign In to GovPilot
+          </button>
+        </form>
+
+        <div style="margin-top: 28px; text-align: center;">
+          <a href="{{ url_for('main.demo_tour') }}" style="font-size: 13px; color: var(--accent); font-weight: 600;">
+            ✨ Prefer an interactive walkthrough? Launch Demo Tour →
+          </a>
+        </div>
+      </div>
+
+      <!-- Right side: Quick Demo Accounts Selection -->
+      <div style="background-color: #0b192c; color: #ffffff; padding: 40px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 8px;">1-Click Sandbox Switcher</div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #ffffff;">Test As Any Persona</h2>
+          <p style="font-size: 13px; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;">
+            Click below to immediately log in as any role without typing passwords:
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{ url_for('auth.quick_login', role='government') }}" class="btn btn-outline" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #ffffff; justify-content: space-between;">
+              <div style="text-align: left;">
+                <div style="font-weight: 600; font-size: 13px;">Government Officer (CITO)</div>
+                <div style="font-size: 11px; color: #94a3b8;">government@govpilot.demo</div>
+              </div>
+              <span class="badge badge-gov">Login →</span>
+            </a>
+
+            <a href="{{ url_for('auth.quick_login', role='startup') }}" class="btn btn-outline" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #ffffff; justify-content: space-between;">
+              <div style="text-align: left;">
+                <div style="font-weight: 600; font-size: 13px;">Startup Founder (TransitAI)</div>
+                <div style="font-size: 11px; color: #94a3b8;">startup@innovate.demo</div>
+              </div>
+              <span class="badge badge-startup">Login →</span>
+            </a>
+
+            <a href="{{ url_for('auth.quick_login', role='evaluator') }}" class="btn btn-outline" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #ffffff; justify-content: space-between;">
+              <div style="text-align: left;">
+                <div style="font-weight: 600; font-size: 13px;">Expert Evaluator (Transport)</div>
+                <div style="font-size: 11px; color: #94a3b8;">expert@review.demo</div>
+              </div>
+              <span class="badge badge-evaluator">Login →</span>
+            </a>
+
+            <a href="{{ url_for('auth.quick_login', role='validator') }}" class="btn btn-outline" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: #ffffff; justify-content: space-between;">
+              <div style="text-align: left;">
+                <div style="font-weight: 600; font-size: 13px;">Independent Validator (Audit)</div>
+                <div style="font-size: 11px; color: #94a3b8;">validator@audit.demo</div>
+              </div>
+              <span class="badge badge-validator">Login →</span>
+            </a>
+          </div>
+        </div>
+
+        <div style="font-size: 11.5px; color: #64748b; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 16px;">
+          Default password for all seeded accounts: <code>Password123</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

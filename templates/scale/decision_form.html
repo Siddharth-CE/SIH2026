@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Record Scale Decision - {{ pilot.code }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('pilot.passport', id=pilot.id) }}">{{ pilot.code }}</a>
+      <span>/</span>
+      <span>Scale Decision</span>
+    </div>
+    <h1 class="page-title">Authorized Scale-Up Procurement Decision</h1>
+    <p class="page-subtitle">{{ pilot.code }}: {{ pilot.title }}</p>
+  </div>
+</div>
+
+<div class="gp-card" style="max-width: 900px;">
+  <form action="{{ url_for('scale.decision', pilot_id=pilot.id) }}" method="POST">
+    <div class="gp-card-body" style="padding: 28px;">
+      
+      <div class="form-group">
+        <label class="form-label">Decision Type <span class="required">*</span></label>
+        <select name="decision_type" class="form-control">
+          <option value="Prepare for Scale" {% if decision and decision.decision_type == 'Prepare for Scale' %}selected{% endif %}>Prepare for Scale (Successful Pilot — Generate Procurement Pack)</option>
+          <option value="Extend Pilot" {% if decision and decision.decision_type == 'Extend Pilot' %}selected{% endif %}>Extend Pilot (Additional testing required)</option>
+          <option value="Modify & Re-test" {% if decision and decision.decision_type == 'Modify & Re-test' %}selected{% endif %}>Modify & Re-test (Adjust parameters)</option>
+          <option value="Close Pilot" {% if decision and decision.decision_type == 'Close Pilot' %}selected{% endif %}>Close Pilot (Archive outcomes)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Target Statutory Procurement Pathway</label>
+        <input type="text" name="target_procurement_pathway" class="form-control" value="{{ decision.target_procurement_pathway if decision else 'General Financial Rule 149 Innovation Procurement / Open Competitive RFP with Pilot Pre-qualification Technical Standard' }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Estimated Budget Envelope for Full Scale</label>
+        <input type="text" name="estimated_scale_budget" class="form-control" value="{{ decision.estimated_scale_budget if decision else '₹1,80,00,000 (Pan-City 250 Buses over 24 Months)' }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Target Rollout Timeline (Months)</label>
+        <input type="number" name="target_timeline_months" class="form-control" value="{{ decision.target_timeline_months if decision else 18 }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Decision Justification & Value for Money <span class="required">*</span></label>
+        <textarea name="reasoning" class="form-control" required placeholder="Explain how pilot evidence supports scale-up...">{{ decision.reasoning if decision else 'The 90-day pilot achieved a 34.1% reduction in commuter waiting times and 94.2% ETA accuracy with high system reliability (99.9% uptime). Independent validation confirms technical maturity (TRL 8) and positive cost-to-benefit ratio. Expanding the solution across the entire 250-bus fleet will transform municipal transit reliability.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Supporting Procurement Notes</label>
+        <textarea name="supporting_notes" class="form-control" placeholder="Specific technical SLA terms to transfer to formal tender...">{{ decision.supporting_notes if decision else 'Draft Scale-Up Pack generated containing verified technical specifications, SLA benchmarks, and integration standards for inclusion in the upcoming Pan-City Intelligent Transport System tender.' }}</textarea>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Authorized Signatory Name <span class="required">*</span></label>
+          <input type="text" name="authorized_signatory_name" class="form-control" value="{{ decision.authorized_signatory_name if decision else current_user.name }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Signatory Official Title <span class="required">*</span></label>
+          <input type="text" name="authorized_signatory_title" class="form-control" value="{{ decision.authorized_signatory_title if decision else current_user.title or 'Chief Innovation & Technology Officer' }}" required>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 18px;">
+        <a href="{{ url_for('pilot.passport', id=pilot.id) }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-accent btn-lg">Authorize & Record Decision in Audit Trail</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

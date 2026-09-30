@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Departments Management - GovPilot Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.admin_dashboard') }}">Admin</a>
+      <span>/</span>
+      <span>Departments</span>
+    </div>
+    <h1 class="page-title">Government Departments & Municipal Authorities</h1>
+    <p class="page-subtitle">Configure public sector departmental tenants, jurisdictions, and sectors.</p>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+  <!-- Departments Table -->
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Registered Departments</span>
+    </div>
+    <div class="gp-table-container" style="border:none;">
+      <table class="gp-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Department Name</th>
+            <th>Sector</th>
+            <th>Challenges</th>
+            <th>Active Pilots</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in departments %}
+          <tr>
+            <td><code>{{ d.code }}</code></td>
+            <td><strong>{{ d.name }}</strong></td>
+            <td>{{ d.sector }}</td>
+            <td><span class="badge badge-info">{{ d.challenges|length }}</span></td>
+            <td><span class="badge badge-success">{{ d.pilots|length }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Register Department Form -->
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Register Department</span>
+    </div>
+    <form action="{{ url_for('admin.departments') }}" method="POST">
+      <div class="gp-card-body">
+        <div class="form-group">
+          <label class="form-label">Department Name <span class="required">*</span></label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Smart Energy & Grid Authority" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Code / Acronym <span class="required">*</span></label>
+          <input type="text" name="code" class="form-control" placeholder="e.g. ENERGY" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Sector <span class="required">*</span></label>
+          <input type="text" name="sector" class="form-control" placeholder="e.g. Renewable Energy & Grid" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Official Contact Email</label>
+          <input type="email" name="contact_email" class="form-control" placeholder="energy.innovation@state.gov.in">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" placeholder="Jurisdiction and mandate details..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Register Department</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

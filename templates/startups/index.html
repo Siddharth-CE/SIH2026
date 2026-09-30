@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Startup Discovery Directory - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Startups</span>
+    </div>
+    <h1 class="page-title">Startup Innovation Directory</h1>
+    <p class="page-subtitle">Pre-screened startups with verified Innovation Passports and Technology Readiness Levels.</p>
+  </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="gp-card" style="margin-bottom: 20px;">
+  <div class="gp-card-body" style="padding: 14px 20px;">
+    <form action="{{ url_for('startup.index') }}" method="GET" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="flex-grow: 1; min-width: 220px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Search Startup / Technology</label>
+        <input type="text" name="q" class="form-control" placeholder="Search by name, technology, domain..." value="{{ search_query }}">
+      </div>
+
+      <div style="min-width: 180px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Sector</label>
+        <select name="sector" class="form-control">
+          <option value="">All Sectors</option>
+          {% for s in sectors %}
+          <option value="{{ s }}" {% if selected_sector == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Filter Startups</button>
+        <a href="{{ url_for('startup.index') }}" class="btn btn-outline btn-sm" style="height: 38px;">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Startups Cards Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+  {% for s in startups %}
+  <div class="gp-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div class="gp-card-header">
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--primary); margin: 0;">{{ s.name }}</h3>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">{{ s.headquarters or 'India' }} • Founded {{ s.founded_year or 2022 }}</div>
+        </div>
+        <span class="badge badge-info">{{ s.trl_level[:5] }}</span>
+      </div>
+
+      <div class="gp-card-body" style="padding: 16px 20px;">
+        <div style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+          {{ s.summary or s.product_description or 'Specialized government technology innovation partner.' }}
+        </div>
+
+        <div style="margin-bottom: 12px; font-size: 12px;">
+          <strong style="color: var(--text-main);">Core Stack:</strong>
+          <div style="color: var(--info); font-weight: 500; margin-top: 2px;">{{ s.core_technology }}</div>
+        </div>
+
+        <!-- Capability Tags -->
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px;">
+          {% for cap in s.get_capabilities_list() %}
+          <span class="badge badge-secondary" style="font-size: 10.5px;">{{ cap }}</span>
+          {% endfor %}
+        </div>
+
+        <!-- Trust Badges -->
+        <div style="display: flex; gap: 8px; font-size: 11.5px; color: #15803d; border-top: 1px solid var(--border-color); padding-top: 10px;">
+          <span>✓ DPIIT Recognized</span>
+          <span>✓ ISO 27001</span>
+          <span>✓ {{ s.deployments|length }} Deployments</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11.5px; color: var(--text-muted);">{{ s.product_name or 'Platform' }}</span>
+      <a href="{{ url_for('startup.passport', id=s.id) }}" class="btn btn-sm btn-primary">
+        Inspect Innovation Passport →
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

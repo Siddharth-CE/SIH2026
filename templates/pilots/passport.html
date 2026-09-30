@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pilot.code }}: {{ pilot.title }} - Pilot Passport{% endblock %}
+
+{% block content %}
+<!-- Pilot Passport Header Banner -->
+<div class="passport-header-banner">
+  <div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+      <span class="badge" style="background: rgba(255,255,255,0.2); color: #ffffff; font-size: 11px;">PILOT PASSPORT</span>
+      <code style="color: #93c5fd; font-size: 13px; font-weight: bold;">{{ pilot.code }}</code>
+    </div>
+    <h1 style="font-size: 22px; font-weight: 800; color: #ffffff; margin: 0 0 6px;">{{ pilot.title }}</h1>
+    <div style="font-size: 13px; color: #cbd5e1; display: flex; gap: 16px; flex-wrap: wrap;">
+      <span>🏢 <strong>Department:</strong> {{ pilot.department.name if pilot.department else 'N/A' }}</span>
+      <span>🚀 <strong>Partner Startup:</strong> {{ pilot.startup.name if pilot.startup else 'N/A' }}</span>
+      <span>⏱ <strong>Duration:</strong> {{ pilot.duration_days }} Days ({{ pilot.start_date }} to {{ pilot.end_date or 'Active' }})</span>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span class="badge {{ pilot.get_status_badge_class() }}" style="font-size: 14px; padding: 6px 14px;">
+      {{ pilot.status.replace('_', ' ').upper() }}
+    </span>
+    
+    {% if pilot.status == 'ready_for_scale' or pilot.status == 'completed' %}
+    <a href="{{ url_for('scale.pack_preview', pilot_id=pilot.id) }}" class="btn btn-accent btn-sm">
+      📄 Scale-Up Pack
+    </a>
+    <a href="{{ url_for('scale.download_pdf', pilot_id=pilot.id) }}" class="btn btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.4);">
+      📥 PDF
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- 10 Passport Navigation Tabs -->
+<div class="passport-tabs">
+  <div class="passport-tab {% if active_tab == 'overview' %}active{% endif %}" data-tab-target="tab-overview">1. Overview</div>
+  <div class="passport-tab {% if active_tab == 'objectives' %}active{% endif %}" data-tab-target="tab-objectives">2. Objectives</div>
+  <div class="passport-tab {% if active_tab == 'kpis' %}active{% endif %}" data-tab-target="tab-kpis">3. KPIs & Telemetry</div>
+  <div class="passport-tab {% if active_tab == 'milestones' %}active{% endif %}" data-tab-target="tab-milestones">4. Milestones</div>
+  <div class="passport-tab {% if active_tab == 'payments' %}active{% endif %}" data-tab-target="tab-payments">5. Payments</div>
+  <div class="passport-tab {% if active_tab == 'documents' %}active{% endif %}" data-tab-target="tab-documents">6. Documents</div>
+  <div class="passport-tab {% if active_tab == 'data_ip' %}active{% endif %}" data-tab-target="tab-data-ip">7. Data & Security</div>
+  <div class="passport-tab {% if active_tab == 'risks' %}active{% endif %}" data-tab-target="tab-risks">8. Risk Register</div>
+  <div class="passport-tab {% if active_tab == 'evidence' %}active{% endif %}" data-tab-target="tab-evidence">9. Evidence Analytics</div>
+  <div class="passport-tab {% if active_tab == 'decision' %}active{% endif %}" data-tab-target="tab-decision">10. Validation & Scale</div>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div class="passport-tab-content" id="tab-overview" style="display: {% if active_tab == 'overview' %}block{% else %}none{% endif %};">
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <div>
+      <div class="gp-card">
+        <div class="gp-card-header">
+          <span class="gp-card-title">Sandbox Overview & Progress</span>
+          <span class="badge badge-success">{{ pilot.progress_percentage }}% Completed</span>
+        </div>
+        <div class="gp-card-body">
+          <p style="font-size: 13.5px; color: var(--text-main); line-height: 1.6; margin-bottom: 16px;">
+            {{ pilot.objectives_summary or 'Validating AI-driven predictive headway synchronization and real-time arrival forecasts to eliminate vehicle bunching.' }}
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Total Pilot Budget</div>
+              <div style="font-size: 18px; font-weight: 700; color: var(--primary);">₹{{ "{:,.0f}".format(pilot.total_budget) }}</div>
+              <div style="font-size: 12px; color: var(--success); margin-top: 2px;">Disbursed: ₹{{ "{:,.0f}".format(pilot.disbursed_amount or 0) }} (75%)</div>
+            </div>
+            <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">KPI Achievement Status</div>
+              <div style="font-size: 18px; font-weight: 700; color: var(--success);">4 / 4 Target Achieved</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Verified by Independent Validator</div>
+            </div>
+          </div>
+
+          <div style="font-size: 13px; line-height: 1.6;">
+            <div><strong>Testing Corridor / Scope:</strong> {{ pilot.test_scope }}</div>
+            <div><strong>Associated Challenge:</strong> <a href="{{ url_for('challenge.view', id=pilot.challenge.id) }}">{{ pilot.challenge.code }} ({{ pilot.challenge.title }})</a></div>
+            <div><strong>Source Proposal:</strong> <a href="{{ url_for('application.view', id=pilot.application_id) }}">{{ pilot.source_application.code if pilot.source_application else 'APP-2026-0042' }}</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="gp-card">
+        <div class="gp-card-header">
+          <span class="gp-card-title">Governance Stakeholders</span>
+        </div>
+        <div class="gp-card-body" style="font-size: 12.5px; line-height: 1.8;">
+          <div><strong>Department Officer:</strong><br/>{{ pilot.assigned_officer.name if pilot.assigned_officer else 'Rajesh Verma (CITO)' }}</div>
+          <div style="margin-top: 8px;"><strong>Startup Representative:</strong><br/>{{ pilot.startup.founders if pilot.startup else 'Aarav Patel (Founder)' }}</div>
+          <div style="margin-top: 8px;"><strong>Independent Validator:</strong><br/>{{ pilot.assigned_validator.name if pilot.assigned_validator else 'Vikram Deshmukh (Audit Cell)' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: OBJECTIVES & SCOPE -->
+<div class="passport-tab-content" id="tab-objectives" style="display: {% if active_tab == 'objectives' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Pilot Objectives & Sandbox Operational Envelope</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="margin-bottom: 20px;">
+        <h4 style="color: var(--primary); margin-bottom: 6px;">Primary Objectives</h4>
+        <p style="font-size: 13.5px; color: var(--text-main); line-height: 1.6;">{{ pilot.objectives_summary }}</p>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <h4 style="color: var(--primary); margin-bottom: 6px;">Designated Test Scope & Fleet Assets</h4>
+        <p style="font-size: 13.5px; color: var(--text-main); line-height: 1.6;">{{ pilot.test_scope }}</p>
+      </div>
+
+      <div>
+        <h4 style="color: var(--primary); margin-bottom: 6px;">Pilot Success Criteria for Transition to Scale</h4>
+        <pre style="background: #f8fafc; padding: 14px; border-radius: 8px; font-family: inherit; font-size: 13px; line-height: 1.6;">{{ pilot.success_criteria }}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: KPIS & TELEMETRY -->
+<div class="passport-tab-content" id="tab-kpis" style="display: {% if active_tab == 'kpis' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Quantitative KPI Telemetry & Targets</span>
+      <span class="badge badge-success">4/4 Targets Achieved</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        {% for k in pilot.kpis %}
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <strong style="color: var(--primary); font-size: 13px;">{{ k.name }}</strong>
+            <span class="badge {{ k.get_status_badge_class() }}">{{ k.status }}</span>
+          </div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 4px;">
+            {{ k.current_value }} <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">{{ k.unit }}</span>
+          </div>
+          <div style="font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 6px; margin-top: 8px;">
+            <span>Baseline: <strong>{{ k.baseline_value }}{{ k.unit }}</strong></span>
+            <span>Target: <strong>{{ k.target_value }}{{ k.unit }}</strong></span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Live Line Chart -->
+      <div style="margin-bottom: 20px;">
+        <h4 style="font-size: 14px; color: var(--primary); margin-bottom: 8px;">Waiting Time 12-Week Rolling Trend</h4>
+        <canvas id="passport-kpi-chart" style="width: 100%; height: 220px;"></canvas>
+      </div>
+
+      <!-- Record New Observation Form (For Officer / Validator) -->
+      {% if current_user.is_authenticated and (current_user.is_government or current_user.is_validator or current_user.is_admin) %}
+      <div style="background: #f1f5f9; padding: 16px; border-radius: 8px; margin-top: 20px;">
+        <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;">Record New KPI Observation</h4>
+        <form action="{{ url_for('pilot.record_kpi_observation', id=pilot.id) }}" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <select name="kpi_id" class="form-control" style="flex: 2; min-width: 180px;" required>
+            {% for k in pilot.kpis %}
+            <option value="{{ k.id }}">{{ k.name }} (Current: {{ k.current_value }} {{ k.unit }})</option>
+            {% endfor %}
+          </select>
+          <input type="number" step="0.1" name="recorded_value" class="form-control" placeholder="Observed Value" style="flex: 1; min-width: 120px;" required>
+          <input type="text" name="period_label" class="form-control" placeholder="Period (e.g. Week 13)" style="flex: 1; min-width: 120px;">
+          <input type="text" name="evidence_note" class="form-control" placeholder="Evidence verification note..." style="flex: 2; min-width: 200px;">
+          <button type="submit" class="btn btn-primary btn-sm">Record Observation</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: MILESTONES -->
+<div class="passport-tab-content" id="tab-milestones" style="display: {% if active_tab == 'milestones' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Milestone Execution & Approval Workflow</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        {% for m in pilot.milestones %}
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">MILESTONE {{ m.sequence_order }}</span>
+              <h3 style="font-size: 15px; color: var(--primary); margin: 2px 0;">{{ m.title }}</h3>
+              <div style="font-size: 12px; color: var(--text-muted);">Due: {{ m.due_date }} • Payment: ₹{{ "{:,.0f}".format(m.payment_amount) }} ({{ m.payment_percentage }}%)</div>
+            </div>
+            <span class="badge {{ m.get_status_badge_class() }}" style="font-size: 12px; padding: 4px 10px;">{{ m.status }}</span>
+          </div>
+
+          <p style="font-size: 13px; color: var(--text-main); margin-bottom: 10px; line-height: 1.5;">
+            {{ m.description }}
+          </p>
+
+          {% if m.submission_notes %}
+          <div style="background: #ffffff; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 12.5px; margin-bottom: 10px;">
+            <strong>Startup Submission Notes:</strong> {{ m.submission_notes }}
+          </div>
+          {% endif %}
+
+          {% if m.review_comments %}
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; border-radius: 6px; font-size: 12.5px; color: #166534; margin-bottom: 10px;">
+            <strong>Government Review Sign-Off:</strong> {{ m.review_comments }}
+          </div>
+          {% endif %}
+
+          <!-- Milestone Action Controls -->
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+            {% if current_user.is_authenticated and current_user.is_startup and m.status in ('Pending', 'Rejected') %}
+            <form action="{{ url_for('pilot.submit_milestone', id=pilot.id, m_id=m.id) }}" method="POST" style="display: flex; gap: 8px;">
+              <input type="text" name="submission_notes" class="form-control" placeholder="Provide deliverable notes..." required style="width: 250px;">
+              <button type="submit" class="btn btn-sm btn-accent">Submit Deliverable</button>
+            </form>
+            {% endif %}
+
+            {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) and m.status == 'Under Review' %}
+            <form action="{{ url_for('pilot.review_milestone', id=pilot.id, m_id=m.id) }}" method="POST" style="display: flex; gap: 8px;">
+              <input type="text" name="comments" class="form-control" placeholder="Verification sign-off notes..." required style="width: 250px;">
+              <button type="submit" name="decision" value="Approved" class="btn btn-sm btn-success">Approve Deliverable</button>
+              <button type="submit" name="decision" value="Rejected" class="btn btn-sm btn-danger">Reject</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 5: PAYMENTS -->
+<div class="passport-tab-content" id="tab-payments" style="display: {% if active_tab == 'payments' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Milestone Payment Disbursement Tracking</span>
+      <span style="font-size: 12px; color: var(--text-muted);">PFMS Integrated Sandbox</span>
+    </div>
+    <div class="gp-table-container">
+      <table class="gp-table">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Milestone</th>
+            <th>Amount</th>
+            <th>Disbursed Date</th>
+            <th>Transaction Ref</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pay in pilot.payments %}
+          <tr>
+            <td><code>{{ pay.invoice_number }}</code></td>
+            <td>{{ pay.milestone.title[:30] if pay.milestone else 'Milestone' }}</td>
+            <td><strong>₹{{ "{:,.0f}".format(pay.amount) }}</strong></td>
+            <td>{{ pay.disbursed_at.strftime('%d %b %Y') if pay.disbursed_at else '—' }}</td>
+            <td><code>{{ pay.transaction_reference or 'Pending Release' }}</code></td>
+            <td><span class="badge {{ pay.get_status_badge_class() }}">{{ pay.status }}</span></td>
+            <td>
+              {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) and pay.status == 'Department Approved' %}
+              <form action="{{ url_for('pilot.disburse_payment', id=pilot.id, p_id=pay.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-accent" onclick="return confirm('Trigger PFMS Treasury Disbursal for this milestone?');">
+                  Disburse Payment
+                </button>
+              </form>
+              {% else %}
+              <span style="font-size: 12px; color: var(--text-muted);">{{ pay.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 6: DOCUMENTS -->
+<div class="passport-tab-content" id="tab-documents" style="display: {% if active_tab == 'documents' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Verified Pilot Documents & Artifacts</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Tamper-evident file registry</span>
+    </div>
+    <div class="gp-card-body">
+      <div class="gp-table-container" style="border:none; margin-bottom: 20px;">
+        <table class="gp-table">
+          <thead>
+            <tr>
+              <th>Document Title</th>
+              <th>Category</th>
+              <th>Version</th>
+              <th>File Name</th>
+              <th>Size</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in pilot.documents %}
+            <tr>
+              <td><strong>{{ doc.title }}</strong></td>
+              <td>{{ doc.document_type }}</td>
+              <td><code>{{ doc.version }}</code></td>
+              <td>{{ doc.file_name }}</td>
+              <td>{{ doc.file_size_kb }} KB</td>
+              <td><span class="badge {{ doc.get_status_badge_class() }}">{{ doc.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Upload Form -->
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 16px; border-radius: 8px;">
+        <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;">Upload Supporting Document</h4>
+        <form action="{{ url_for('pilot.upload_document', id=pilot.id) }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <input type="text" name="title" class="form-control" placeholder="Document Title (e.g. Telemetry Security Scan)" style="flex: 2; min-width: 200px;" required>
+          <select name="document_type" class="form-control" style="flex: 1; min-width: 150px;">
+            <option value="Milestone Evidence">Milestone Evidence</option>
+            <option value="Cybersecurity Checklist">Cybersecurity Checklist</option>
+            <option value="Pilot Agreement">Pilot Agreement</option>
+            <option value="Validation Report">Validation Report</option>
+          </select>
+          <input type="file" name="file" class="form-control" style="flex: 2; min-width: 200px;" required>
+          <button type="submit" class="btn btn-primary btn-sm">Upload File</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 7: DATA, IP & SECURITY -->
+<div class="passport-tab-content" id="tab-data-ip" style="display: {% if active_tab == 'data_ip' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Data Protection, IP Governance & Cybersecurity Protocols</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div>
+          <h4 style="color: var(--primary); margin-bottom: 10px;">Data & Intellectual Property Boundaries</h4>
+          <div style="font-size: 13px; line-height: 1.8;">
+            <div><strong>Data Shared in Sandbox:</strong><br/>{{ pilot.data_types_shared }}</div>
+            <div style="margin-top: 8px;"><strong>Access Level:</strong> <span class="badge badge-warning">{{ pilot.data_access_level }}</span></div>
+            <div style="margin-top: 8px;"><strong>Data Retention Period:</strong> {{ pilot.data_retention_period }}</div>
+            <div style="margin-top: 8px;"><strong>Startup Proprietary IP:</strong><br/>{{ pilot.startup_ip_terms }}</div>
+            <div style="margin-top: 8px;"><strong>Government Usage Rights:</strong><br/>{{ pilot.government_usage_rights }}</div>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--primary); margin-bottom: 10px;">Cybersecurity Compliance Checklist</h4>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px;">
+            <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+              <span>Role-Based Authentication</span>
+              <strong style="color: var(--success);">✓ Verified</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+              <span>TLS 1.3 End-to-End Encryption</span>
+              <strong style="color: var(--success);">✓ Verified</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+              <span>Access Control & Principle of Least Privilege</span>
+              <strong style="color: var(--success);">✓ Verified</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+              <span>Immutable Audit Logging</span>
+              <strong style="color: var(--success);">✓ Verified</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+              <span>Incident Response & Escalation Protocol</span>
+              <strong style="color: var(--success);">✓ Verified</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 8: RISK REGISTER -->
+<div class="passport-tab-content" id="tab-risks" style="display: {% if active_tab == 'risks' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Pilot Risk Register & Mitigation Strategies</span>
+    </div>
+    <div class="gp-card-body">
+      <div class="gp-table-container" style="border:none; margin-bottom: 20px;">
+        <table class="gp-table">
+          <thead>
+            <tr>
+              <th>Risk Description</th>
+              <th>Category</th>
+              <th>Severity</th>
+              <th>Probability</th>
+              <th>Owner</th>
+              <th>Mitigation Strategy</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in pilot.risks %}
+            <tr>
+              <td><strong>{{ r.title }}</strong></td>
+              <td>{{ r.category }}</td>
+              <td><span class="badge {{ r.get_severity_badge_class() }}">{{ r.severity }}</span></td>
+              <td>{{ r.probability }}</td>
+              <td>{{ r.owner }}</td>
+              <td style="font-size: 12px;">{{ r.mitigation_strategy }}</td>
+              <td><span class="badge {{ r.get_status_badge_class() }}">{{ r.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Risk Form -->
+      {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) %}
+      <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 16px; border-radius: 8px;">
+        <h4 style="font-size: 13px; color: var(--primary); margin-bottom: 10px;">Log New Identified Risk</h4>
+        <form action="{{ url_for('pilot.add_risk', id=pilot.id) }}" method="POST" style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <input type="text" name="title" class="form-control" placeholder="Risk title..." style="flex: 2; min-width: 180px;" required>
+          <select name="category" class="form-control" style="flex: 1; min-width: 120px;">
+            <option value="Technical">Technical</option>
+            <option value="Operational">Operational</option>
+            <option value="Security">Security</option>
+            <option value="Integration">Integration</option>
+          </select>
+          <select name="severity" class="form-control" style="flex: 1; min-width: 100px;">
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+            <option value="Critical">Critical</option>
+          </select>
+          <input type="text" name="mitigation_strategy" class="form-control" placeholder="Mitigation strategy..." style="flex: 3; min-width: 220px;" required>
+          <button type="submit" class="btn btn-primary btn-sm">Add Risk</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- TAB 9: EVIDENCE ANALYTICS -->
+<div class="passport-tab-content" id="tab-evidence" style="display: {% if active_tab == 'evidence' %}block{% else %}none{% endif %};">
+  <div class="gp-card">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Pilot Evidence Analytics: Baseline vs Target vs Actual</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+        Comparative performance benchmarks verified across 90-day sandbox telemetry streams:
+      </div>
+      
+      <canvas id="bar-comparison-chart" style="width: 100%; height: 220px;"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 10: VALIDATION & SCALE DECISION -->
+<div class="passport-tab-content" id="tab-decision" style="display: {% if active_tab == 'decision' %}block{% else %}none{% endif %};">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <!-- Independent Validation Dossier -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">Independent Validation Sign-Off</span>
+        <span class="badge badge-validator">Audited</span>
+      </div>
+      <div class="gp-card-body">
+        {% if pilot.validation_reports %}
+          {% set vr = pilot.validation_reports[-1] %}
+          <div style="font-size: 13px; line-height: 1.6;">
+            <div><strong>Report Code:</strong> <code>{{ vr.report_code }}</code></div>
+            <div><strong>Validator:</strong> {{ vr.validator.name if vr.validator else 'Audit Panel' }}</div>
+            <div><strong>Evidence Sufficiency:</strong> <span class="badge badge-success">{{ vr.evidence_sufficiency }}</span></div>
+            <div style="margin-top: 8px;"><strong>Findings:</strong><br/>{{ vr.kpi_verification_summary }}</div>
+            <div style="margin-top: 8px;"><strong>Conclusion:</strong><br/>{{ vr.conclusion }}</div>
+            <div style="margin-top: 10px; padding: 10px; background: #f0fdf4; border-radius: 6px; color: #166534;">
+              <strong>Recommendation:</strong> {{ vr.scale_recommendation }}
+            </div>
+          </div>
+        {% else %}
+          <div style="text-align: center; padding: 24px; color: var(--text-muted);">
+            Validation report pending.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Scale-Up Decision -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">Scale-Up Procurement Decision</span>
+        <span class="badge badge-scale">Decision Issued</span>
+      </div>
+      <div class="gp-card-body">
+        {% if pilot.scale_decisions %}
+          {% set sd = pilot.scale_decisions[-1] %}
+          <div style="font-size: 13px; line-height: 1.6;">
+            <div><strong>Decision:</strong> <span class="badge badge-scale">{{ sd.decision_type }}</span></div>
+            <div><strong>Authorized Signatory:</strong> {{ sd.authorized_signatory_name }} ({{ sd.authorized_signatory_title }})</div>
+            <div><strong>Target Procurement Pathway:</strong><br/>{{ sd.target_procurement_pathway }}</div>
+            <div><strong>Budget Envelope:</strong> {{ sd.estimated_scale_budget }}</div>
+            <div style="margin-top: 8px;"><strong>Justification:</strong><br/>{{ sd.reasoning }}</div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <a href="{{ url_for('scale.pack_preview', pilot_id=pilot.id) }}" class="btn btn-accent btn-sm" style="flex: 1;">
+              View Draft Scale-Up Pack
+            </a>
+            <a href="{{ url_for('scale.download_pdf', pilot_id=pilot.id) }}" class="btn btn-primary btn-sm" style="flex: 1;">
+              Download PDF Pack
+            </a>
+          </div>
+        {% else %}
+          <p style="font-size: 13px; color: var(--text-muted);">Formal decision has not been issued yet.</p>
+          {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) %}
+          <a href="{{ url_for('scale.decision', pilot_id=pilot.id) }}" class="btn btn-accent btn-sm">
+            Record Scale Decision →
+          </a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'];
+  const waitTimes = [16.4, 15.8, 15.1, 14.3, 13.6, 12.8, 12.2, 11.7, 11.2, 11.0, 10.9, 10.8];
+  
+  GovChart.drawLineTrend('passport-kpi-chart', weeks, waitTimes, 11.0, 'min', '#15803d');
+
+  const comparisonItems = [
+    { name: 'Avg Wait Time (min)', baseline: 16.4, target: 11.0, actual: 10.8, unit: 'm', actualAchieved: true },
+    { name: 'ETA Accuracy (%)', baseline: 58.0, target: 92.0, actual: 94.2, unit: '%', actualAchieved: true },
+    { name: 'Headway Regularity (%)', baseline: 61.2, target: 85.0, actual: 89.6, unit: '%', actualAchieved: true },
+    { name: 'Telemetry Uptime (%)', baseline: 96.5, target: 99.5, actual: 99.9, unit: '%', actualAchieved: true }
+  ];
+  GovChart.drawBarComparison('bar-comparison-chart', comparisonItems);
+});
+</script>
+{% endblock %}

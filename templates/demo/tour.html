@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}Guided Demo Tour - GovPilot Hero Innovation Journey{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Demo Tour</span>
+    </div>
+    <h1 class="page-title">GovPilot Guided Demo Tour</h1>
+    <p class="page-subtitle">Walkthrough of the full end-to-end innovation procurement lifecycle in 8 steps.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('scale.pack_preview', pilot_id=pilot.id if pilot else 1) }}" class="btn btn-accent btn-sm">
+      📄 View Final Scale-Up Pack
+    </a>
+  </div>
+</div>
+
+<!-- Interactive Tour Navigation -->
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Innovation Lifecycle Stages</span>
+    <span style="font-size: 12px; color: var(--text-muted);">Click any stage to inspect the live verified state</span>
+  </div>
+  <div class="gp-card-body" style="padding-bottom: 10px;">
+    <div class="pipeline-track" style="margin-bottom: 0;">
+      <div class="pipeline-step completed" onclick="showTourStep(0)" style="cursor: pointer;">
+        <div class="step-num">1</div>
+        <span>1. Problem</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(1)" style="cursor: pointer;">
+        <div class="step-num">2</div>
+        <span>2. Challenge</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(2)" style="cursor: pointer;">
+        <div class="step-num">3</div>
+        <span>3. Discovery</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(3)" style="cursor: pointer;">
+        <div class="step-num">4</div>
+        <span>4. Evaluation</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(4)" style="cursor: pointer;">
+        <div class="step-num">5</div>
+        <span>5. Pilot</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(5)" style="cursor: pointer;">
+        <div class="step-num">6</div>
+        <span>6. KPIs</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed" onclick="showTourStep(6)" style="cursor: pointer;">
+        <div class="step-num">7</div>
+        <span>7. Validation</span>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step active" onclick="showTourStep(7)" style="cursor: pointer;">
+        <div class="step-num">8</div>
+        <span>8. Scale</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 1: Government Problem -->
+<div class="tour-stage-card gp-card" id="tour-step-0" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 1: Government Has an Operational Problem</span>
+    <span class="badge badge-warning">Initial Bottleneck</span>
+  </div>
+  <div class="gp-card-body">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+      <div>
+        <h3 style="color: var(--primary); margin-bottom: 10px;">Urban Public Bus Delays & Commuter Uncertainty</h3>
+        <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+          The Urban Transport Department manages over 450 municipal buses. Due to peak hour traffic variability, buses frequently experience severe vehicle bunching (multiple buses on the same route arriving at once followed by a 30-minute void). Commuters experience average wait times of 16.4 minutes and lack accurate real-time arrival forecasts.
+        </p>
+        <div style="background: #f8fafc; border-left: 4px solid var(--danger); padding: 14px; border-radius: 4px; margin-bottom: 16px;">
+          <strong>Why Traditional Procurement Fails Here:</strong><br/>
+          Standard procurement tender documents prescribe rigid hardware specifications rather than outcome metrics. Commercial off-the-shelf systems cost millions and require lengthy tender cycles with no guaranteed performance reduction in passenger wait times.
+        </div>
+      </div>
+      <div style="background: #f1f5f9; padding: 16px; border-radius: 8px;">
+        <div style="font-weight: 600; font-size: 13px; color: var(--primary); margin-bottom: 10px;">Baseline Metrics</div>
+        <div style="font-size: 12.5px; color: var(--text-main); line-height: 1.8;">
+          • <strong>Average Wait Time:</strong> 16.4 min<br/>
+          • <strong>Schedule Adherence:</strong> 61.2%<br/>
+          • <strong>Commuter ETA Accuracy:</strong> 58.0%<br/>
+          • <strong>Telemetry Availability:</strong> 96.5%
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+      <button class="btn btn-primary" onclick="showTourStep(1)">Next: Structuring the Challenge →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step 2: Outcome Challenge -->
+<div class="tour-stage-card gp-card" id="tour-step-1" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 2: GovPilot Structures the Problem with AI Assistance</span>
+    <span class="badge badge-published">Outcome-Based Challenge</span>
+  </div>
+  <div class="gp-card-body">
+    <h3 style="color: var(--primary); margin-bottom: 8px;">CH-TRANS-2026-001: AI-Based Public Bus Delay Prediction & Dynamic ETA Improvement</h3>
+    <p style="color: var(--text-muted); margin-bottom: 16px;">
+      The department used the <strong>8-Step Outcome Builder</strong> and AI Assistant to convert the open problem into a structured sandbox challenge with defined test boundaries and quantitative KPIs.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+      <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Pilot Scope</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--primary);">10 Buses / 5 Routes</div>
+        <div style="font-size: 12px; color: var(--text-muted);">42 Total Bus Stops</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Sandbox Duration</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--primary);">90 Days</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Controlled Environment</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Indicative Budget</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--primary);">₹10,00,000</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Milestone Disbursal</div>
+      </div>
+      <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Core Target KPI</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--success);">< 11.0 min Wait</div>
+        <div style="font-size: 12px; color: var(--text-muted);">>30% Improvement</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(0)">← Previous</button>
+      <div>
+        <a href="{{ url_for('challenge.view', id=challenge.id if challenge else 1) }}" class="btn btn-outline" target="_blank">View Live Challenge Page</a>
+        <button class="btn btn-primary" onclick="showTourStep(2)">Next: Startup Discovery →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 3: Startup Discovery -->
+<div class="tour-stage-card gp-card" id="tour-step-2" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 3: Semantic Startup Matching & Innovation Passports</span>
+    <span class="badge badge-info">Ecosystem Discovery</span>
+  </div>
+  <div class="gp-card-body">
+    <p style="color: var(--text-muted); margin-bottom: 16px;">
+      GovPilot automatically matches eligible startups against the challenge requirements using semantic tags, capability profiles, and deployment history.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px;">
+      <div style="border: 2px solid #2563eb; background: #eff6ff; padding: 16px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: #1e40af; font-size: 15px;">TransitAI Labs</strong>
+          <span class="badge badge-primary" style="font-size: 13px;">94% Match</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">PulseTransit Platform (TRL 8)</div>
+        <div style="font-size: 12px; line-height: 1.6;">
+          ✓ Predictive ML Headway Engine<br/>
+          ✓ AIS-140 GPS Telemetry Compatibility<br/>
+          ✓ ISO 27001 Certified & DPIIT Recognized<br/>
+          ✓ 2 Previous Municipal Bus Deployments
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--border-color); background: #ffffff; padding: 16px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="font-size: 15px;">UrbanFlow Systems</strong>
+          <span class="badge badge-warning">88% Match</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">FlowSync Edge (TRL 7)</div>
+        <div style="font-size: 12px; line-height: 1.6;">
+          ✓ IoT Corridor Signal Priority<br/>
+          ✓ Micro-traffic Simulation<br/>
+          ✓ ISO 27001 Certified<br/>
+          ✓ Hardware-based sensor requirements
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--border-color); background: #ffffff; padding: 16px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="font-size: 15px;">MobilityVision</strong>
+          <span class="badge badge-warning">82% Match</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">VisionCrowd AI (TRL 7)</div>
+        <div style="font-size: 12px; line-height: 1.6;">
+          ✓ Onboard Computer Vision<br/>
+          ✓ Passenger Dwell Density Sensing<br/>
+          ✓ CERT-In Security Cleared<br/>
+          ✓ High optical camera maintenance overhead
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(1)">← Previous</button>
+      <button class="btn btn-primary" onclick="showTourStep(3)">Next: Screening & Evaluation →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step 4: Screening & Evaluation -->
+<div class="tour-stage-card gp-card" id="tour-step-3" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 4: Automated Eligibility Screening & Expert Evaluation</span>
+    <span class="badge badge-eval">Weighted Scoring</span>
+  </div>
+  <div class="gp-card-body">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <strong style="font-size: 14px; color: var(--primary);">Automated Eligibility Checklist</strong>
+        <div style="margin-top: 12px; font-size: 12.5px; line-height: 1.8;">
+          <div style="color: var(--success);">✓ DPIIT Startup Recognition (#DPIIT-REC-2022-84910)</div>
+          <div style="color: var(--success);">✓ AIS-140 GPS Telemetry Compatibility (NMEA / REST)</div>
+          <div style="color: var(--success);">✓ ISO 27001 Information Security Management</div>
+          <div style="color: var(--success);">✓ Prior Municipal Transit Reference (Metropolitan Transport)</div>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <strong style="font-size: 14px; color: var(--primary);">Expert Evaluation (Dr. Sunita Mehra)</strong>
+        <div style="margin-top: 12px; font-size: 12.5px; line-height: 1.8;">
+          • Technical Feasibility (25%): <strong>94 / 100</strong><br/>
+          • Expected Outcome (25%): <strong>92 / 100</strong><br/>
+          • Scalability (15%): <strong>90 / 100</strong><br/>
+          • Security & Risk (15%): <strong>88 / 100</strong><br/>
+          • Weighted Total Score: <strong style="color: var(--primary); font-size: 14px;">91.2 / 100</strong><br/>
+          <span style="font-size: 11px; color: var(--text-muted);">✓ Conflict of Interest Declared and Cleared</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(2)">← Previous</button>
+      <div>
+        <a href="{{ url_for('application.comparison', challenge_id=challenge.id if challenge else 1) }}" class="btn btn-outline" target="_blank">View Multi-Startup Matrix</a>
+        <button class="btn btn-primary" onclick="showTourStep(4)">Next: Controlled Pilot Sandbox →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 5: Pilot Passport -->
+<div class="tour-stage-card gp-card" id="tour-step-4" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 5: Pilot Passport & Controlled Sandbox Execution</span>
+    <span class="badge badge-pilot">Sandbox Active</span>
+  </div>
+  <div class="gp-card-body">
+    <div class="passport-header-banner" style="margin-bottom: 16px;">
+      <div>
+        <div style="font-size: 12px; color: #93c5fd; text-transform: uppercase;">Pilot ID: GP-MH-2026-00421</div>
+        <h2 style="font-size: 20px; font-weight: 700; margin: 4px 0;">PulseTransit: Real-Time Telemetry & Bus Headway Optimization</h2>
+        <div style="font-size: 13px; color: #cbd5e1;">TransitAI Labs • Urban Transport Department • 90 Days</div>
+      </div>
+      <div>
+        <span class="badge badge-scale" style="font-size: 13px; padding: 6px 14px;">Ready for Scale</span>
+      </div>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 16px;">
+      The 10-tab Pilot Passport tracks objectives, weekly KPIs, milestone submissions, PFMS payment disbursements, IP terms, cybersecurity parameters, and risks.
+    </p>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(3)">← Previous</button>
+      <div>
+        <a href="{{ url_for('pilot.passport', id=pilot.id if pilot else 1) }}" class="btn btn-outline" target="_blank">Open Full 10-Tab Passport</a>
+        <button class="btn btn-primary" onclick="showTourStep(5)">Next: Quantitative KPI Results →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 6: Quantitative KPIs -->
+<div class="tour-stage-card gp-card" id="tour-step-5" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 6: Measurable KPI Results (Baseline vs Actual)</span>
+    <span class="badge badge-success">Target Achieved (4/4)</span>
+  </div>
+  <div class="gp-card-body">
+    <div class="gp-table-container" style="margin-bottom: 20px;">
+      <table class="gp-table">
+        <thead>
+          <tr>
+            <th>KPI Metric</th>
+            <th>Baseline</th>
+            <th>Pilot Target</th>
+            <th>Observed Result</th>
+            <th>Delta Improvement</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Average Passenger Waiting Time</strong></td>
+            <td>16.4 min</td>
+            <td>< 11.0 min</td>
+            <td><strong>10.8 min</strong></td>
+            <td><span style="color: var(--success); font-weight: bold;">-34.1% reduction</span></td>
+            <td><span class="badge badge-success">Target Achieved</span></td>
+          </tr>
+          <tr>
+            <td><strong>Commuter ETA Accuracy (within 90s)</strong></td>
+            <td>58.0%</td>
+            <td>> 92.0%</td>
+            <td><strong>94.2%</strong></td>
+            <td><span style="color: var(--success); font-weight: bold;">+36.2% accuracy</span></td>
+            <td><span class="badge badge-success">Target Achieved</span></td>
+          </tr>
+          <tr>
+            <td><strong>Route Schedule & Headway Adherence</strong></td>
+            <td>61.2%</td>
+            <td>> 85.0%</td>
+            <td><strong>89.6%</strong></td>
+            <td><span style="color: var(--success); font-weight: bold;">+28.4% consistency</span></td>
+            <td><span class="badge badge-success">Target Achieved</span></td>
+          </tr>
+          <tr>
+            <td><strong>Central Telemetry System Uptime</strong></td>
+            <td>96.5%</td>
+            <td>> 99.5%</td>
+            <td><strong>99.9%</strong></td>
+            <td><span style="color: var(--success); font-weight: bold;">99.9% availability</span></td>
+            <td><span class="badge badge-success">Target Achieved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(4)">← Previous</button>
+      <button class="btn btn-primary" onclick="showTourStep(6)">Next: Independent Validation →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step 7: Independent Validation -->
+<div class="tour-stage-card gp-card" id="tour-step-6" style="display: none;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 7: Independent Third-Party Technical Validation</span>
+    <span class="badge badge-validator">Report VAL-GP-2026-0042</span>
+  </div>
+  <div class="gp-card-body">
+    <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 18px; border-radius: 8px; margin-bottom: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <strong style="color: var(--primary); font-size: 15px;">National Technical Audit Cell — Final Validation Dossier</strong>
+        <span class="badge badge-success">Evidence Sufficiency: High</span>
+      </div>
+      <p style="color: var(--text-main); font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+        <strong>Methodology:</strong> Cross-referenced raw AIS-140 GPS packet stream archives, automated timestamp logs, physical passenger survey ground truth audits at 8 terminal bus stops, and automated synthetic load testing of API endpoints.
+      </p>
+      <div style="background: #ffffff; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12.5px; line-height: 1.6; margin-bottom: 12px;">
+        <strong>Validation Finding:</strong> "The pilot has conclusively demonstrated technological maturity (TRL 8), operational viability, and quantifiable commuter benefit. Zero privacy or security vulnerabilities discovered. Recommend transition to formal statutory procurement."
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);">
+        Signed by: <strong>Vikram Deshmukh</strong>, Lead Auditor, National Technical Audit Cell
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(5)">← Previous</button>
+      <button class="btn btn-primary" onclick="showTourStep(7)">Next: Scale Decision & Procurement Pack →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Step 8: Scale Decision & Scale-Up Pack -->
+<div class="tour-stage-card gp-card" id="tour-step-7" style="display: block;">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Stage 8: Evidence-Based Scale Decision & Official Scale-Up Pack</span>
+    <span class="badge badge-scale">Scale-Up Ready</span>
+  </div>
+  <div class="gp-card-body">
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; margin-bottom: 20px;">
+      <div>
+        <h3 style="color: var(--primary); margin-bottom: 8px;">Formal Procurement Decision: Prepare for Scale</h3>
+        <p style="color: var(--text-muted); font-size: 13.5px; line-height: 1.6; margin-bottom: 14px;">
+          The authorized departmental decision-maker reviewed the verified KPI performance, risk mitigations, and validation sign-off, officially approving the technical specifications for full-scale municipal procurement.
+        </p>
+
+        <div style="font-size: 13px; line-height: 1.8; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+          • <strong>Target Pathway:</strong> Rule 149 Innovation Procurement / Open Competitive RFP with Pilot Pre-qualification Standard<br/>
+          • <strong>Estimated Budget Envelope:</strong> ₹1,80,00,000 (Pan-City 250 Buses over 24 Months)<br/>
+          • <strong>Authorized Signatory:</strong> Rajesh Verma, Chief Innovation & Technology Officer<br/>
+          • <strong>Governance Integrity:</strong> Tamper-evident Audit Event logged in SQLite
+        </div>
+      </div>
+
+      <div style="background: #0f2a4a; color: #ffffff; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Downloadable Dossier</div>
+          <h4 style="font-size: 16px; margin: 6px 0 10px; color: #ffffff;">Official Scale-Up Pack</h4>
+          <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
+            Automated PDF dossier containing complete verified problem statements, test scopes, KPI proofs, validator sign-offs, and procurement SLA specifications.
+          </p>
+        </div>
+        <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <a href="{{ url_for('scale.download_pdf', pilot_id=pilot.id if pilot else 1) }}" class="btn btn-accent btn-sm" style="width: 100%;">
+            📥 Download Scale-Up Pack (PDF)
+          </a>
+          <a href="{{ url_for('scale.pack_preview', pilot_id=pilot.id if pilot else 1) }}" class="btn btn-outline btn-sm" style="color: #ffffff; border-color: rgba(255,255,255,0.3); width: 100%;">
+            View Interactive HTML Dossier
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between;">
+      <button class="btn btn-outline" onclick="showTourStep(6)">← Previous</button>
+      <a href="{{ url_for('dashboard.gov_dashboard') }}" class="btn btn-primary">Go to Command Center Dashboard →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTourStep(index) {
+  for (let i = 0; i < 8; i++) {
+    const el = document.getElementById(`tour-step-${i}`);
+    if (el) el.style.display = (i === index) ? 'block' : 'none';
+  }
+  const steps = document.querySelectorAll('.pipeline-track .pipeline-step');
+  steps.forEach((s, idx) => {
+    if (idx === index) {
+      s.className = 'pipeline-step active';
+    } else if (idx < index) {
+      s.className = 'pipeline-step completed';
+    } else {
+      s.className = 'pipeline-step';
+    }
+  });
+  window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+</script>
+{% endblock %}

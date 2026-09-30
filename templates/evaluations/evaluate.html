@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluate Proposal - {{ application.code }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('evaluation.index') }}">Evaluations</a>
+      <span>/</span>
+      <span>Evaluate {{ application.code }}</span>
+    </div>
+    <h1 class="page-title">Expert Technical Scoring & Evaluation</h1>
+    <p class="page-subtitle">{{ application.startup.name }} • {{ application.challenge.title }}</p>
+  </div>
+  <div>
+    {% if evaluation.status == 'submitted' %}
+      <span class="badge badge-success" style="font-size: 13px; padding: 6px 12px;">✓ Evaluation Submitted (Score: {{ evaluation.total_weighted_score }}/100)</span>
+    {% endif %}
+  </div>
+</div>
+
+<div class="split-screen">
+  <!-- Left Side: Candidate Proposal Reference -->
+  <div style="max-height: calc(100vh - 180px); overflow-y: auto; padding-right: 8px;">
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">Candidate Proposal: {{ application.code }}</span>
+        <span class="badge badge-info">{{ application.product_readiness_trl }}</span>
+      </div>
+      <div class="gp-card-body">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">{{ application.solution_title }}</h3>
+        <p style="font-size: 13px; color: var(--text-main); line-height: 1.6; margin-bottom: 16px;">
+          {{ application.solution_summary }}
+        </p>
+
+        <div style="background: #f8fafc; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+          <strong style="font-size: 12.5px; color: var(--primary);">Alignment with Problem:</strong>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px; line-height: 1.5;">
+            {{ application.problem_alignment }}
+          </p>
+        </div>
+
+        <div style="background: #f8fafc; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+          <strong style="font-size: 12.5px; color: var(--primary);">Technical & Algorithmic Approach:</strong>
+          <pre style="font-size: 12px; font-family: inherit; margin-top: 4px; white-space: pre-wrap; color: var(--text-main); line-height: 1.5;">{{ application.technical_approach }}</pre>
+        </div>
+
+        <div style="background: #f8fafc; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+          <strong style="font-size: 12.5px; color: var(--primary);">Implementation & Milestones:</strong>
+          <pre style="font-size: 12px; font-family: inherit; margin-top: 4px; white-space: pre-wrap; color: var(--text-main);">{{ application.implementation_plan }}</pre>
+        </div>
+
+        <div style="background: #f8fafc; padding: 14px; border-radius: 8px;">
+          <strong style="font-size: 12.5px; color: var(--primary);">Target KPIs & Budget:</strong>
+          <div style="font-size: 12px; margin-top: 4px;"><strong>Budget:</strong> {{ application.budget_total }}</div>
+          <pre style="font-size: 12px; font-family: inherit; margin-top: 4px; white-space: pre-wrap; color: var(--text-main);">{{ application.proposed_kpis }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: 6 Criteria Scoring Form -->
+  <div>
+    <div class="gp-card">
+      <div class="gp-card-header" style="background: #f8fafc;">
+        <span class="gp-card-title">Expert Scoring Worksheet</span>
+        <div style="font-size: 13px; font-weight: 700; color: var(--primary);">
+          Total: <span id="live-total-score">{{ evaluation.total_weighted_score or 0 }}</span> / 100
+        </div>
+      </div>
+
+      <form action="{{ url_for('evaluation.evaluate', app_id=application.id) }}" method="POST">
+        <div class="gp-card-body">
+          
+          <!-- Mandatory Conflict of Interest Declaration -->
+          <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: #92400e;">
+              <input type="checkbox" name="conflict_of_interest" required {% if evaluation.conflict_of_interest_cleared %}checked{% endif %} style="margin-top: 3px;">
+              <span>Conflict of Interest Declaration: I hereby confirm that I have no personal, financial, or organizational conflict of interest with {{ application.startup.name }} in evaluating this proposal.</span>
+            </label>
+          </div>
+
+          <!-- Criterion 1: Technical Feasibility (25%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">1. Technical Feasibility (Weight: 25%)</label>
+              <input type="number" name="technical_feasibility_score" id="score-tech" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.technical_feasibility_score or 90 }}" required>
+            </div>
+            <textarea name="technical_feasibility_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on TRL maturity, edge telemetry, and feasibility...">{{ evaluation.technical_feasibility_comment }}</textarea>
+          </div>
+
+          <!-- Criterion 2: Expected Outcome (25%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">2. Expected Outcome & Delay Impact (Weight: 25%)</label>
+              <input type="number" name="expected_outcome_score" id="score-outcome" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.expected_outcome_score or 90 }}" required>
+            </div>
+            <textarea name="expected_outcome_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on headway synchronization and waiting time reduction...">{{ evaluation.expected_outcome_comment }}</textarea>
+          </div>
+
+          <!-- Criterion 3: Scalability (15%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">3. Scalability to City Fleet (Weight: 15%)</label>
+              <input type="number" name="scalability_score" id="score-scale" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.scalability_score or 85 }}" required>
+            </div>
+            <textarea name="scalability_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on cloud architecture and pan-city scaling...">{{ evaluation.scalability_comment }}</textarea>
+          </div>
+
+          <!-- Criterion 4: Security & Risk (15%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">4. Security & Data Governance (Weight: 15%)</label>
+              <input type="number" name="security_risk_score" id="score-sec" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.security_risk_score or 85 }}" required>
+            </div>
+            <textarea name="security_risk_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on ISO 27001, data localization, and encryption...">{{ evaluation.security_risk_comment }}</textarea>
+          </div>
+
+          <!-- Criterion 5: Implementation Readiness (10%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">5. Implementation Readiness (Weight: 10%)</label>
+              <input type="number" name="implementation_readiness_score" id="score-ready" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.implementation_readiness_score or 90 }}" required>
+            </div>
+            <textarea name="implementation_readiness_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on team capability and field onboarding...">{{ evaluation.implementation_readiness_comment }}</textarea>
+          </div>
+
+          <!-- Criterion 6: Cost-to-Value (10%) -->
+          <div class="form-group" style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin-bottom: 0;">6. Value for Money & Cost (Weight: 10%)</label>
+              <input type="number" name="cost_value_score" id="score-cost" class="form-control score-input" style="width: 80px; text-align: center; font-weight: bold;" min="0" max="100" value="{{ evaluation.cost_value_score or 90 }}" required>
+            </div>
+            <textarea name="cost_value_comment" class="form-control" style="min-height: 50px; font-size: 12px;" placeholder="Comments on budget envelope efficiency...">{{ evaluation.cost_value_comment }}</textarea>
+          </div>
+
+          <!-- Overall Recommendation -->
+          <div class="form-group">
+            <label class="form-label">Overall Recommendation</label>
+            <select name="overall_recommendation" class="form-control">
+              <option value="Strongly Recommend for Pilot Selection" {% if evaluation.overall_recommendation == 'Strongly Recommend for Pilot Selection' %}selected{% endif %}>Strongly Recommend for Pilot Selection</option>
+              <option value="Recommend with Standard Oversight" {% if evaluation.overall_recommendation == 'Recommend with Standard Oversight' %}selected{% endif %}>Recommend with Standard Oversight</option>
+              <option value="Conditional Recommendation" {% if evaluation.overall_recommendation == 'Conditional Recommendation' %}selected{% endif %}>Conditional Recommendation</option>
+              <option value="Do Not Recommend" {% if evaluation.overall_recommendation == 'Do Not Recommend' %}selected{% endif %}>Do Not Recommend</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">General Evaluator Remarks</label>
+            <textarea name="general_remarks" class="form-control" placeholder="Summary notes for the government selection committee...">{{ evaluation.general_remarks }}</textarea>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <span style="font-size: 12px; color: var(--text-muted);">Weighted Score updates automatically</span>
+            <button type="submit" class="btn btn-accent btn-lg">Submit Expert Evaluation</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const inputs = document.querySelectorAll('.score-input');
+  const liveScore = document.getElementById('live-total-score');
+
+  function calculateScore() {
+    const t = parseFloat(document.getElementById('score-tech').value) || 0;
+    const o = parseFloat(document.getElementById('score-outcome').value) || 0;
+    const s = parseFloat(document.getElementById('score-scale').value) || 0;
+    const sec = parseFloat(document.getElementById('score-sec').value) || 0;
+    const r = parseFloat(document.getElementById('score-ready').value) || 0;
+    const c = parseFloat(document.getElementById('score-cost').value) || 0;
+
+    const weighted = (t * 0.25) + (o * 0.25) + (s * 0.15) + (sec * 0.15) + (r * 0.10) + (c * 0.10);
+    if (liveScore) liveScore.innerText = weighted.toFixed(1);
+  }
+
+  inputs.forEach(input => input.addEventListener('input', calculateScore));
+  calculateScore();
+});
+</script>
+{% endblock %}

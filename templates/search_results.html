@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ query }}" - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Search</span>
+    </div>
+    <h1 class="page-title">Search Results for "{{ query }}"</h1>
+    <p class="page-subtitle">Matching challenges, startups, pilots, and municipal departments.</p>
+  </div>
+</div>
+
+{% if not challenges and not startups and not pilots and not departments %}
+  <div class="gp-card">
+    <div class="gp-card-body" style="text-align: center; padding: 40px 20px;">
+      <div style="font-size: 32px; margin-bottom: 12px;">🔍</div>
+      <h3 style="color: var(--primary); margin-bottom: 6px;">No exact records found</h3>
+      <p style="color: var(--text-muted); font-size: 13.5px; max-width: 400px; margin: 0 auto 16px;">
+        No active records matched "{{ query }}". Try broader keywords like "bus", "water", "road", "vision", or "sensor".
+      </p>
+      <a href="{{ url_for('challenge.index') }}" class="btn btn-outline btn-sm">Explore All Challenges</a>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Challenges Results -->
+{% if challenges %}
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Outcome Challenges ({{ challenges|length }})</span>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Challenge Title</th>
+          <th>Sector</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in challenges %}
+        <tr>
+          <td><code>{{ c.code }}</code></td>
+          <td><strong>{{ c.title }}</strong></td>
+          <td>{{ c.sector }}</td>
+          <td><span class="badge {{ c.get_status_badge_class() }}">{{ c.status.title() }}</span></td>
+          <td><a href="{{ url_for('challenge.view', id=c.id) }}" class="btn btn-sm btn-outline">View Details →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Startups Results -->
+{% if startups %}
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Eligible Startups ({{ startups|length }})</span>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Startup Name</th>
+          <th>Sector / Domain</th>
+          <th>Core Technology</th>
+          <th>Readiness Level</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in startups %}
+        <tr>
+          <td><strong>{{ s.name }}</strong></td>
+          <td>{{ s.sector }}</td>
+          <td>{{ s.core_technology }}</td>
+          <td><span class="badge badge-info">{{ s.trl_level }}</span></td>
+          <td><a href="{{ url_for('startup.passport', id=s.id) }}" class="btn btn-sm btn-outline">View Passport →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Pilots Results -->
+{% if pilots %}
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Pilot Passports ({{ pilots|length }})</span>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Pilot Code</th>
+          <th>Pilot Title</th>
+          <th>Partner Startup</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pilots %}
+        <tr>
+          <td><code>{{ p.code }}</code></td>
+          <td><strong>{{ p.title }}</strong></td>
+          <td>{{ p.startup.name if p.startup else '—' }}</td>
+          <td><span class="badge {{ p.get_status_badge_class() }}">{{ p.status.title() }}</span></td>
+          <td><a href="{{ url_for('pilot.passport', id=p.id) }}" class="btn btn-sm btn-outline">Open Passport →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

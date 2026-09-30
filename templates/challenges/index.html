@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Outcome-Based Challenges - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Challenges</span>
+    </div>
+    <h1 class="page-title">Outcome-Based Government Challenges</h1>
+    <p class="page-subtitle">Structured problem statements with quantitative targets and sandbox boundaries.</p>
+  </div>
+  {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) %}
+  <div>
+    <a href="{{ url_for('challenge.builder') }}" class="btn btn-accent">
+      + Create Challenge (AI Assisted)
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Filters Bar -->
+<div class="gp-card" style="margin-bottom: 20px;">
+  <div class="gp-card-body" style="padding: 14px 20px;">
+    <form action="{{ url_for('challenge.index') }}" method="GET" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="flex-grow: 1; min-width: 200px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Search Keyword</label>
+        <input type="text" name="q" class="form-control" placeholder="Search by title, code, problem..." value="{{ search_query }}">
+      </div>
+
+      <div style="min-width: 180px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Sector</label>
+        <select name="sector" class="form-control">
+          <option value="">All Sectors</option>
+          {% for s in sectors %}
+          <option value="{{ s }}" {% if selected_sector == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="min-width: 150px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Status</label>
+        <select name="status" class="form-control">
+          <option value="">All Statuses</option>
+          <option value="published" {% if selected_status == 'published' %}selected{% endif %}>Published</option>
+          <option value="pilot_active" {% if selected_status == 'pilot_active' %}selected{% endif %}>Pilot Active</option>
+          <option value="in_evaluation" {% if selected_status == 'in_evaluation' %}selected{% endif %}>In Evaluation</option>
+          <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Draft</option>
+          <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Apply Filters</button>
+        <a href="{{ url_for('challenge.index') }}" class="btn btn-outline btn-sm" style="height: 38px;">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Challenges Table -->
+<div class="gp-card">
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Challenge ID</th>
+          <th>Challenge Title</th>
+          <th>Department</th>
+          <th>Sector</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th>Pilot Duration</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if challenges %}
+          {% for c in challenges %}
+          <tr>
+            <td><code>{{ c.code }}</code></td>
+            <td>
+              <a href="{{ url_for('challenge.view', id=c.id) }}" style="font-weight: 600; color: var(--primary);">
+                {{ c.title }}
+              </a>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">{{ c.problem_summary[:65] }}...</div>
+            </td>
+            <td>{{ c.department.name if c.department else '—' }}</td>
+            <td>{{ c.sector }}</td>
+            <td><span class="badge {{ c.get_status_badge_class() }}">{{ c.status.replace('_', ' ').title() }}</span></td>
+            <td><span class="badge badge-info">{{ c.applications|length }} proposals</span></td>
+            <td>{{ c.duration_days }} Days</td>
+            <td>{{ c.created_at.strftime('%d %b %Y') }}</td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <a href="{{ url_for('challenge.view', id=c.id) }}" class="btn btn-sm btn-outline">View</a>
+                {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) %}
+                  {% if c.status == 'draft' %}
+                    <form action="{{ url_for('challenge.publish', id=c.id) }}" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-accent">Publish</button>
+                    </form>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No challenges found matching your selected filters. Try broadening your criteria.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

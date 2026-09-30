@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Expert Evaluator Dashboard - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.evaluator_dashboard') }}">Home</a>
+      <span>/</span>
+      <span>Evaluator Portal</span>
+    </div>
+    <h1 class="page-title">Expert Evaluator Workspace</h1>
+    <p class="page-subtitle">{{ current_user.name }} • {{ current_user.title or 'Domain Expert' }}</p>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card accent-warning">
+    <div class="kpi-label">Proposals Pending Scoring</div>
+    <div class="kpi-value">{{ pending_apps|length }}</div>
+    <div class="kpi-subtext">Requires conflict-of-interest check</div>
+  </div>
+  <div class="kpi-card accent-scale">
+    <div class="kpi-label">Completed Evaluations</div>
+    <div class="kpi-value">{{ completed_count }}</div>
+    <div class="kpi-subtext">Weighted score submitted</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Draft Reviews</div>
+    <div class="kpi-value">{{ draft_count }}</div>
+    <div class="kpi-subtext">In progress</div>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Proposals Assigned for Expert Evaluation</span>
+  </div>
+  <div class="gp-table-container" style="border:none; border-radius:0;">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>App Code</th>
+          <th>Challenge</th>
+          <th>Candidate Startup</th>
+          <th>TRL Level</th>
+          <th>Eligibility Check</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in pending_apps %}
+        <tr>
+          <td><code>{{ app.code }}</code></td>
+          <td><strong>{{ app.challenge.title[:40] }}...</strong></td>
+          <td>{{ app.startup.name }}</td>
+          <td><span class="badge badge-info">{{ app.product_readiness_trl }}</span></td>
+          <td><span class="badge badge-success">✓ Verified</span></td>
+          <td>
+            <a href="{{ url_for('evaluation.evaluate', app_id=app.id) }}" class="btn btn-sm btn-accent">
+              Start Evaluation & Score →
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

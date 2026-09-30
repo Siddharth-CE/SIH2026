@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Outcome-Based Challenge Builder - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('challenge.index') }}">Challenges</a>
+      <span>/</span>
+      <span>Challenge Builder</span>
+    </div>
+    <h1 class="page-title">Outcome-Based Challenge Builder</h1>
+    <p class="page-subtitle">Multi-step wizard to formulate quantifiable public sector innovation challenges.</p>
+  </div>
+</div>
+
+<!-- AI Challenge Assistant Interface Box -->
+<div class="gp-card" style="background: linear-gradient(135deg, #0f2a4a, #1e3a8a); color: #ffffff; border: none; margin-bottom: 24px;">
+  <div class="gp-card-body" style="padding: 24px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">🤖</span>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin: 0;">AI Challenge Assistant</h3>
+          <p style="font-size: 12px; color: #93c5fd; margin: 0;">Describe your operational problem in plain language to generate a complete 8-step outcome blueprint.</p>
+        </div>
+      </div>
+      <span class="badge" style="background: rgba(255,255,255,0.15); color: #ffffff;">Natural Language to Blueprint</span>
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
+      <input type="text" id="ai-prompt-input" class="form-control" style="flex-grow: 1; background: #ffffff; color: var(--text-main);" placeholder="e.g. We have frequent potholes on municipal arterials and our manual inspection teams take 3 weeks per zone...">
+      <button type="button" id="btn-ai-generate" class="btn btn-accent" style="white-space: nowrap;">
+        <span>✨ Generate Challenge with AI</span>
+      </button>
+    </div>
+
+    <div id="ai-status-msg" style="display: none; margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 12.5px;"></div>
+  </div>
+</div>
+
+<!-- 8-Step Wizard Container -->
+<div class="gp-card" id="challenge-wizard">
+  <div class="wizard-steps">
+    <div class="wizard-step-item active">1. Problem</div>
+    <div class="wizard-step-item">2. Current State</div>
+    <div class="wizard-step-item">3. Desired Outcome</div>
+    <div class="wizard-step-item">4. Pilot Scope</div>
+    <div class="wizard-step-item">5. Data & APIs</div>
+    <div class="wizard-step-item">6. Constraints</div>
+    <div class="wizard-step-item">7. Evaluation</div>
+    <div class="wizard-step-item">8. Review & Publish</div>
+  </div>
+
+  <form action="{{ url_for('challenge.builder') }}" method="POST">
+    <div class="gp-card-body" style="padding: 28px;">
+      
+      <!-- Step 1: Problem -->
+      <div class="wizard-step-content" style="display: block;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 1 — Problem Definition</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Define the core public operational bottleneck without specifying solutions.</p>
+
+        <div class="form-group">
+          <label class="form-label">Challenge Title <span class="required">*</span></label>
+          <input type="text" name="title" id="field-title" class="form-control" placeholder="e.g. AI-Assisted Pavement Distress Detection & Automated Work Orders" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Department <span class="required">*</span></label>
+            <select name="department_id" class="form-control" required>
+              {% for d in departments %}
+              <option value="{{ d.id }}">{{ d.name }} ({{ d.code }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sector <span class="required">*</span></label>
+            <input type="text" name="sector" id="field-sector" class="form-control" placeholder="e.g. Infrastructure & Roads" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Urgency Level</label>
+            <select name="urgency_level" id="field-urgency" class="form-control">
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+              <option value="Medium">Medium</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Problem Summary (Outcome Focus) <span class="required">*</span></label>
+          <textarea name="problem_summary" id="field-problem-summary" class="form-control" placeholder="Summarize the operational problem and its friction points..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Detailed Operational Background</label>
+          <textarea name="problem_details" id="field-problem-details" class="form-control" placeholder="Context on how the problem currently impacts departmental efficiency..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-primary btn-next-step">Next: Current State →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Current State -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 2 — Current State & Baseline Metrics</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Establish benchmark metrics to evaluate future pilot improvements.</p>
+
+        <div class="form-group">
+          <label class="form-label">Current Operational Baseline</label>
+          <textarea name="baseline_summary" id="field-baseline-summary" class="form-control" placeholder="e.g. Manual inspection covers 15 km/day with 72-hour delay in work-order generation."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Current Legacy Process</label>
+          <textarea name="current_process" id="field-current-process" class="form-control" placeholder="Describe the step-by-step existing manual procedure..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Known Pain Points</label>
+          <textarea name="pain_points" id="field-pain-points" class="form-control" placeholder="e.g. High labor cost, severe monsoon backlog, lack of automated depth measurement..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Affected Stakeholders / Users</label>
+          <input type="text" name="affected_users" id="field-affected-users" class="form-control" placeholder="e.g. 12 Field Engineers, 4 Central Dispatchers, 450,000 Commuters">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Desired Outcome →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Desired Outcome -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 3 — Desired Outcome & Target Improvement</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">State what success looks like in measurable terms.</p>
+
+        <div class="form-group">
+          <label class="form-label">Expected Target Outcome <span class="required">*</span></label>
+          <textarea name="expected_outcome" id="field-expected-outcome" class="form-control" placeholder="e.g. Real-time edge-AI pavement defect classification reducing inspection cycles by 70%..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Improvement Metric</label>
+          <input type="text" name="target_improvement" id="field-target-improvement" class="form-control" placeholder="e.g. 85% reduction in notice-to-dispatch latency, >90% detection accuracy">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target KPI Blueprint</label>
+          <textarea name="target_kpis_summary" id="field-target-kpis" class="form-control" placeholder="List core KPIs with baseline and target thresholds..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Pilot Scope →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Pilot Scope -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 4 — Controlled Pilot Scope & Boundaries</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Bound the test to contain operational risk while testing under real conditions.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Target Geography / Testing Corridor</label>
+            <input type="text" name="geography" id="field-geography" class="form-control" placeholder="e.g. 5 Central Municipal Corridors (80 lane-km)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sandbox Duration (Days)</label>
+            <input type="number" name="duration_days" id="field-duration" class="form-control" value="90">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Target Sample Users / Vehicles Count</label>
+            <input type="text" name="target_users_count" id="field-users-count" class="form-control" placeholder="e.g. 10 Municipal Patrol Vans">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Indicative Budget Envelope</label>
+            <input type="text" name="budget_indicative" id="field-budget" class="form-control" value="₹10,00,000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Designated Test Facilities</label>
+          <input type="text" name="test_facilities" id="field-facilities" class="form-control" placeholder="e.g. Central Municipal Depot & GIS Command Room">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Datasets & APIs →</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Data -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 5 — Data & API Sandboxes</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Specify what telemetry, APIs, and sandbox records the department will provide.</p>
+
+        <div class="form-group">
+          <label class="form-label">Available Datasets</label>
+          <textarea name="available_datasets" id="field-datasets" class="form-control" placeholder="e.g. City GIS base map, 3-year historical repair logs, fleet GPS stream"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Data Sensitivity Classification</label>
+            <select name="data_sensitivity" id="field-sensitivity" class="form-control">
+              <option value="Confidential / Municipal Internal Data">Confidential / Municipal Internal Data</option>
+              <option value="Public Transit Open Telemetry">Public Transit Open Telemetry</option>
+              <option value="Protected Health Information (PHI)">Protected Health Information (PHI)</option>
+              <option value="Critical Infrastructure Restricted">Critical Infrastructure Restricted</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">API Sandbox Availability</label>
+            <input type="text" name="api_availability" id="field-api-availability" class="form-control" placeholder="e.g. REST API with OAuth2 Sandbox Access">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Constraints →</button>
+        </div>
+      </div>
+
+      <!-- Step 6: Constraints -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 6 — Technical Constraints & Security Protocols</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Define compliance and infrastructure guardrails.</p>
+
+        <div class="form-group">
+          <label class="form-label">Technical & Environmental Constraints</label>
+          <textarea name="technical_constraints" id="field-technical-constraints" class="form-control" placeholder="e.g. Edge processing on vehicle 12V battery; IP67 weather-proofing; no sustained 4G reliance."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Cybersecurity & Privacy Redaction Requirements</label>
+          <textarea name="security_requirements" id="field-security-reqs" class="form-control" placeholder="e.g. Real-time face and civilian license plate blurring at edge before frame transmission."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Departmental Integration Endpoints</label>
+          <textarea name="integration_requirements" id="field-integration-reqs" class="form-control" placeholder="e.g. Direct bi-directional sync with Municipal GIS & Public Works ERP."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Evaluation Criteria →</button>
+        </div>
+      </div>
+
+      <!-- Step 7: Evaluation -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 7 — Evaluation Criteria & Success Thresholds</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Establish how startup proposals and pilot results will be verified.</p>
+
+        <div class="form-group">
+          <label class="form-label">Proposal Evaluation Criteria Notes</label>
+          <textarea name="evaluation_criteria_notes" id="field-eval-criteria" class="form-control" placeholder="e.g. Technical Feasibility (25%), Expected Outcome (25%), Scalability (15%), Security (15%), Readiness (10%), Cost (10%)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Pilot Success Thresholds for Scale-Up Transition</label>
+          <textarea name="success_thresholds" id="field-success-thresholds" class="form-control" placeholder="e.g. Pothole detection precision >= 90%, zero privacy breaches, 98%+ edge device uptime."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Review & Publish →</button>
+        </div>
+      </div>
+
+      <!-- Step 8: Review & Publish -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 8 — Blueprint Review & Publication</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Review the finalized outcome challenge before releasing to the startup ecosystem.</p>
+
+        <div id="review-summary-container" style="margin-bottom: 24px;">
+          <!-- Dynamically populated by JS -->
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 20px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Back to Edit</button>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" name="action" value="draft" class="btn btn-outline">Save Draft</button>
+            <button type="submit" name="action" value="publish" class="btn btn-accent btn-lg">🚀 Publish Challenge to Ecosystem</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/wizard.js') }}"></script>
+{% endblock %}

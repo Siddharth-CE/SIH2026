@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Innovation Knowledge Library - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Knowledge Library</span>
+    </div>
+    <h1 class="page-title">Innovation Knowledge & Lessons Library</h1>
+    <p class="page-subtitle">Searchable public sector repository of validated pilots, lessons learned, and scale dossiers.</p>
+  </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="gp-card" style="margin-bottom: 20px;">
+  <div class="gp-card-body" style="padding: 14px 20px;">
+    <form action="{{ url_for('main.knowledge_library') }}" method="GET" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;">
+      <div style="flex-grow: 1; min-width: 240px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Find Similar Problems</label>
+        <input type="text" name="q" class="form-control" placeholder="Search by problem (e.g. bus delay, road pothole, leak)..." value="{{ query }}">
+      </div>
+
+      <div style="min-width: 180px;">
+        <label class="form-label" style="margin-bottom: 4px; font-size: 11px;">Sector</label>
+        <select name="sector" class="form-control">
+          <option value="">All Sectors</option>
+          {% for s in sectors %}
+          <option value="{{ s }}" {% if selected_sector == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Search Library</button>
+        <a href="{{ url_for('main.knowledge_library') }}" class="btn btn-outline btn-sm" style="height: 38px;">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Knowledge Cards Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+  {% for p in pilots %}
+  <div class="gp-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div class="gp-card-header">
+        <div>
+          <span style="font-size: 11px; color: var(--text-muted); font-weight: bold;">{{ p.code }}</span>
+          <h3 style="font-size: 15px; color: var(--primary); margin: 2px 0;">{{ p.title }}</h3>
+          <div style="font-size: 11.5px; color: var(--text-muted);">{{ p.department.name if p.department else 'Municipal Department' }}</div>
+        </div>
+        <span class="badge {{ p.get_status_badge_class() }}">{{ p.status.title() }}</span>
+      </div>
+
+      <div class="gp-card-body" style="padding: 16px 20px;">
+        <p style="font-size: 12.5px; color: var(--text-main); margin-bottom: 12px; line-height: 1.5;">
+          {{ p.objectives_summary or 'Validated municipal innovation sandbox with quantitative telemetry proof.' }}
+        </p>
+
+        <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 12px; line-height: 1.6; margin-bottom: 12px;">
+          <div><strong>Partner Startup:</strong> {{ p.startup.name if p.startup else 'Startup Partner' }}</div>
+          <div><strong>Sandbox Duration:</strong> {{ p.duration_days }} Days</div>
+          <div><strong>Scale Status:</strong> {{ p.status.replace('_', ' ').title() }}</div>
+        </div>
+
+        <div style="font-size: 12px;">
+          <strong style="color: var(--primary);">Verified KPIs:</strong>
+          <ul style="padding-left: 16px; margin-top: 4px; color: var(--text-muted); font-size: 11.5px; line-height: 1.6;">
+            {% for k in p.kpis[:2] %}
+            <li>{{ k.name }}: <strong>{{ k.current_value }}{{ k.unit }}</strong> (Baseline: {{ k.baseline_value }}{{ k.unit }})</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11.5px; color: var(--text-muted);">Scale Dossier</span>
+      <a href="{{ url_for('scale.pack_preview', pilot_id=p.id) }}" class="btn btn-sm btn-primary">
+        Inspect Scale Pack →
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

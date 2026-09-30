@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Application Comparison Matrix - {{ challenge.code }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('challenge.view', id=challenge.id) }}">{{ challenge.code }}</a>
+      <span>/</span>
+      <span>Comparison Matrix</span>
+    </div>
+    <h1 class="page-title">Application Scoring & Evaluation Matrix</h1>
+    <p class="page-subtitle">{{ challenge.title }} • Multi-Candidate Decision Analysis</p>
+  </div>
+  <div>
+    <a href="{{ url_for('challenge.view', id=challenge.id) }}" class="btn btn-outline btn-sm">← Back to Challenge</a>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Side-by-Side Proposal Evaluation Breakdown</span>
+    <span style="font-size: 12px; color: var(--text-muted);">Standardized 6-Criteria Weighted Assessment</span>
+  </div>
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Startup Candidate</th>
+          <th>TRL</th>
+          <th>Tech (25%)</th>
+          <th>Outcome (25%)</th>
+          <th>Scale (15%)</th>
+          <th>Security (15%)</th>
+          <th>Readiness (10%)</th>
+          <th>Cost (10%)</th>
+          <th>Weighted Total</th>
+          <th>Decision Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        {% set ev = app.evaluations[0] if app.evaluations else none %}
+        <tr {% if app.status == 'pilot_selected' %}style="background: #f0fdf4;"{% endif %}>
+          <td>
+            <strong style="font-size: 14px; color: var(--primary);">{{ app.startup.name }}</strong>
+            <div style="font-size: 11px; color: var(--text-muted);">{{ app.code }} • {{ app.solution_title[:30] }}...</div>
+            {% if app.status == 'pilot_selected' %}
+              <span class="badge badge-scale" style="margin-top: 4px; font-size: 10.5px;">✓ Selected for Pilot</span>
+            {% endif %}
+          </td>
+          <td><span class="badge badge-info">{{ app.product_readiness_trl[:5] }}</span></td>
+          <td><strong>{{ ev.technical_feasibility_score if ev else '—' }}</strong></td>
+          <td><strong>{{ ev.expected_outcome_score if ev else '—' }}</strong></td>
+          <td><strong>{{ ev.scalability_score if ev else '—' }}</strong></td>
+          <td><strong>{{ ev.security_risk_score if ev else '—' }}</strong></td>
+          <td><strong>{{ ev.implementation_readiness_score if ev else '—' }}</strong></td>
+          <td><strong>{{ ev.cost_value_score if ev else '—' }}</strong></td>
+          <td>
+            <div style="font-size: 16px; font-weight: 800; color: var(--primary);">
+              {{ app.average_score if app.average_score > 0 else '—' }} <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">/ 100</span>
+            </div>
+          </td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <a href="{{ url_for('application.view', id=app.id) }}" class="btn btn-sm btn-outline">Inspect</a>
+              {% if current_user.is_authenticated and (current_user.is_government or current_user.is_admin) %}
+                {% if app.status != 'pilot_selected' and not app.pilot %}
+                <form action="{{ url_for('application.select_for_pilot', id=app.id) }}" method="POST" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-accent" onclick="return confirm('Award controlled pilot to this startup?');">
+                    Select for Pilot
+                  </button>
+                </form>
+                {% elif app.pilot %}
+                <a href="{{ url_for('pilot.passport', id=app.pilot.id) }}" class="btn btn-sm btn-success">Open Pilot →</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="statutory-notice">
+  <strong>Governance Notice:</strong> High evaluation scoring is an objective advisory input for authorized departmental decision-makers. Pilot selection generates a binding controlled sandbox passport with strict audit logging.
+</div>
+{% endblock %}

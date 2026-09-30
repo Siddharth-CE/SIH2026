@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Pilot Passports - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Pilots</span>
+    </div>
+    <h1 class="page-title">Pilot Passports & Sandbox Management</h1>
+    <p class="page-subtitle">Controlled innovation testing sandboxes with live telemetry and milestone governance.</p>
+  </div>
+</div>
+
+<!-- Pilots Table -->
+<div class="gp-card">
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Pilot Code</th>
+          <th>Pilot Title</th>
+          <th>Department</th>
+          <th>Partner Startup</th>
+          <th>Duration</th>
+          <th>Progress</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if pilots %}
+          {% for p in pilots %}
+          <tr>
+            <td><code>{{ p.code }}</code></td>
+            <td>
+              <a href="{{ url_for('pilot.passport', id=p.id) }}" style="font-weight: 700; color: var(--primary);">
+                {{ p.title }}
+              </a>
+              <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">{{ p.test_scope or 'Municipal Sandbox' }}</div>
+            </td>
+            <td>{{ p.department.name if p.department else '—' }}</td>
+            <td><strong>{{ p.startup.name if p.startup else '—' }}</strong></td>
+            <td>{{ p.duration_days }} Days</td>
+            <td style="min-width: 140px;">
+              <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                <span>Milestones</span>
+                <strong>{{ p.progress_percentage }}%</strong>
+              </div>
+              <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                <div style="width: {{ p.progress_percentage }}%; height: 100%; background: #15803d;"></div>
+              </div>
+            </td>
+            <td><span class="badge {{ p.get_status_badge_class() }}">{{ p.status.replace('_', ' ').title() }}</span></td>
+            <td>
+              <a href="{{ url_for('pilot.passport', id=p.id) }}" class="btn btn-sm btn-primary">
+                Open Passport →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No active pilots found.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

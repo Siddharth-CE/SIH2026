@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Expert Evaluations - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Evaluations</span>
+    </div>
+    <h1 class="page-title">Expert Technical Evaluations</h1>
+    <p class="page-subtitle">Evidence-based scoring against 6 standardized procurement evaluation dimensions.</p>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Completed & In-Progress Technical Evaluations</span>
+  </div>
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Candidate Startup</th>
+          <th>Challenge</th>
+          <th>Evaluator</th>
+          <th>CoI Clearance</th>
+          <th>Weighted Score</th>
+          <th>Recommendation</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if evaluations %}
+          {% for ev in evaluations %}
+          <tr>
+            <td><strong>{{ ev.application.startup.name }}</strong></td>
+            <td>{{ ev.application.challenge.title[:35] }}...</td>
+            <td>{{ ev.evaluator.name }}</td>
+            <td>
+              {% if ev.conflict_of_interest_cleared %}
+                <span style="color: var(--success); font-weight: 600;">✓ Cleared</span>
+              {% else %}
+                <span style="color: var(--danger);">⚠ Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              <strong style="color: var(--primary); font-size: 15px;">{{ ev.total_weighted_score }}</strong> <span style="font-size: 11px; color: var(--text-muted);">/ 100</span>
+            </td>
+            <td><span style="font-size: 12px;">{{ ev.overall_recommendation }}</span></td>
+            <td><span class="badge {% if ev.status == 'submitted' %}badge-success{% else %}badge-warning{% endif %}">{{ ev.status.title() }}</span></td>
+            <td>
+              <a href="{{ url_for('evaluation.evaluate', app_id=ev.application_id) }}" class="btn btn-sm btn-outline">
+                Review / Edit Scoring
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No evaluations found.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

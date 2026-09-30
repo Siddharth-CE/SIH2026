@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Innovation Passport - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('startup.index') }}">Startups</a>
+      <span>/</span>
+      <span>Edit Passport</span>
+    </div>
+    <h1 class="page-title">Edit Startup Innovation Passport</h1>
+    <p class="page-subtitle">Update your technical capabilities, product specifications, and compliance data.</p>
+  </div>
+</div>
+
+<div class="gp-card" style="max-width: 900px;">
+  <form action="{{ url_for('startup.edit_passport') }}" method="POST">
+    <div class="gp-card-body" style="padding: 28px;">
+      <h3 style="font-size: 15px; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        1. Corporate Information
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Startup Brand Name</label>
+          <input type="text" name="name" class="form-control" value="{{ startup.name }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Legal Registered Name</label>
+          <input type="text" name="legal_name" class="form-control" value="{{ startup.legal_name }}">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Registration / CIN</label>
+          <input type="text" name="registration_number" class="form-control" value="{{ startup.registration_number }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">DPIIT Recognition #</label>
+          <input type="text" name="startup_recognition_number" class="form-control" value="{{ startup.startup_recognition_number }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Founded Year</label>
+          <input type="number" name="founded_year" class="form-control" value="{{ startup.founded_year }}">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Headquarters / Location</label>
+          <input type="text" name="headquarters" class="form-control" value="{{ startup.headquarters }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input type="text" name="website" class="form-control" value="{{ startup.website }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Founders & Leadership</label>
+        <input type="text" name="founders" class="form-control" value="{{ startup.founders }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Executive Summary</label>
+        <textarea name="summary" class="form-control">{{ startup.summary }}</textarea>
+      </div>
+
+      <h3 style="font-size: 15px; color: var(--primary); margin: 24px 0 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        2. Technology Stack & Product Architecture
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Flagship Product Name</label>
+          <input type="text" name="product_name" class="form-control" value="{{ startup.product_name }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Technology Readiness Level (TRL)</label>
+          <input type="text" name="trl_level" class="form-control" value="{{ startup.trl_level }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Core Technology Stack</label>
+        <input type="text" name="core_technology" class="form-control" value="{{ startup.core_technology }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Capabilities (Comma-separated for semantic matching)</label>
+        <input type="text" name="capabilities" class="form-control" value="{{ startup.capabilities }}">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Product Description</label>
+        <textarea name="product_description" class="form-control">{{ startup.product_description }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Architecture Overview</label>
+        <textarea name="architecture_overview" class="form-control">{{ startup.architecture_overview }}</textarea>
+      </div>
+
+      <h3 style="font-size: 15px; color: var(--primary); margin: 24px 0 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        3. Trust, Cybersecurity & IP
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Cybersecurity Standards</label>
+          <input type="text" name="cybersecurity_standard" class="form-control" value="{{ startup.cybersecurity_standard }}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deployment Model</label>
+          <input type="text" name="deployment_model" class="form-control" value="{{ startup.deployment_model }}">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Intellectual Property (IP) Ownership Details</label>
+        <textarea name="ip_details" class="form-control">{{ startup.ip_details }}</textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 18px;">
+        <a href="{{ url_for('startup.passport', id=startup.id) }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg">Save Innovation Passport</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

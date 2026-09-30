@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Government Officer Command Center - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.gov_dashboard') }}">Home</a>
+      <span>/</span>
+      <span>Command Center</span>
+    </div>
+    <h1 class="page-title">Government Innovation Command Center</h1>
+    <p class="page-subtitle">Urban Transport & Mass Transit Authority • Live Pilot Governance</p>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('challenge.builder') }}" class="btn btn-accent btn-sm">
+      + Create Outcome Challenge
+    </a>
+    <a href="{{ url_for('pilot.index') }}" class="btn btn-outline btn-sm">
+      View All Pilots
+    </a>
+  </div>
+</div>
+
+<!-- Top 6 KPI Cards -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Active Challenges</div>
+    <div class="kpi-value">{{ active_challenges }}</div>
+    <div class="kpi-subtext"><span style="color: var(--info);">●</span> 3 in evaluation</div>
+  </div>
+
+  <div class="kpi-card accent-info">
+    <div class="kpi-label">Active Pilots</div>
+    <div class="kpi-value">{{ active_pilots }}</div>
+    <div class="kpi-subtext"><span style="color: var(--success);">●</span> 1 ready for scale</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-label">Registered Startups</div>
+    <div class="kpi-value">{{ registered_startups }}</div>
+    <div class="kpi-subtext"><span style="color: var(--success);">↑ 14%</span> this quarter</div>
+  </div>
+
+  <div class="kpi-card accent-warning">
+    <div class="kpi-label">Pending Evaluations</div>
+    <div class="kpi-value">{{ pending_evaluations }}</div>
+    <div class="kpi-subtext"><span style="color: var(--warning);">●</span> Due within 7 days</div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-label">Pilots Completed</div>
+    <div class="kpi-value">{{ pilots_completed }}</div>
+    <div class="kpi-subtext"><span style="color: var(--success);">96.8%</span> audit pass rate</div>
+  </div>
+
+  <div class="kpi-card accent-scale">
+    <div class="kpi-label">Ready for Scale</div>
+    <div class="kpi-value">{{ ready_for_scale }}</div>
+    <div class="kpi-subtext"><span style="color: var(--success);">✓</span> Validated dossiers</div>
+  </div>
+</div>
+
+<!-- Pipeline Track -->
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Innovation Pipeline Lifecycle</span>
+    <span style="font-size: 12px; color: var(--text-muted);">Real-time distribution across active departmental initiatives</span>
+  </div>
+  <div class="gp-card-body">
+    <div class="pipeline-track" style="margin-bottom: 0;">
+      <div class="pipeline-step completed"><div class="step-num">3</div><span>Draft</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed"><div class="step-num">5</div><span>Published</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed"><div class="step-num">8</div><span>Applications</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step active"><div class="step-num">4</div><span>Evaluation</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step active"><div class="step-num">3</div><span>Pilot Sandbox</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed"><div class="step-num">2</div><span>Validation</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-step completed"><div class="step-num">7</div><span>Scale-Up</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts & Trends Grid -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+  <!-- Pilot Performance Graph -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Live Pilot KPI Telemetry: Passenger Waiting Time (min)</span>
+      <span class="badge badge-success">Target: <11.0 min</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+        12-Week Rolling Trend for Pilot <strong>GP-MH-2026-00421 (TransitAI Labs)</strong> across 5 transit corridors.
+      </div>
+      <canvas id="kpi-trend-chart" style="width: 100%; height: 220px;"></canvas>
+    </div>
+  </div>
+
+  <!-- Sector Distribution Card -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Sector Distribution</span>
+      <span style="font-size: 12px; color: var(--text-muted);">6 Sectors</span>
+    </div>
+    <div class="gp-card-body">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Infrastructure & Roads</span><strong>5 Challenges</strong>
+          </div>
+          <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div style="width: 32%; height: 100%; background: #0f2a4a;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Urban Mobility & Transport</span><strong>4 Challenges</strong>
+          </div>
+          <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div style="width: 25%; height: 100%; background: #2563eb;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Water & Sanitation</span><strong>3 Challenges</strong>
+          </div>
+          <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div style="width: 19%; height: 100%; background: #0284c7;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Public Health & Hospitals</span><strong>3 Challenges</strong>
+          </div>
+          <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div style="width: 19%; height: 100%; background: #059669;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span>Municipal Solid Waste</span><strong>2 Challenges</strong>
+          </div>
+          <div style="height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div style="width: 12%; height: 100%; background: #d97706;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active Challenges & Recent Activity -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+  <!-- Active Challenges Table -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Active Departmental Challenges</span>
+      <a href="{{ url_for('challenge.index') }}" style="font-size: 12px; color: var(--info);">View All →</a>
+    </div>
+    <div class="gp-table-container" style="border:none; border-radius:0;">
+      <table class="gp-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Title</th>
+            <th>Sector</th>
+            <th>Status</th>
+            <th>Applications</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in challenges %}
+          <tr>
+            <td><code>{{ c.code }}</code></td>
+            <td><strong>{{ c.title[:38] }}...</strong></td>
+            <td>{{ c.sector }}</td>
+            <td><span class="badge {{ c.get_status_badge_class() }}">{{ c.status.title() }}</span></td>
+            <td><span class="badge badge-info">{{ c.applications|length }} proposals</span></td>
+            <td>
+              <a href="{{ url_for('challenge.view', id=c.id) }}" class="btn btn-sm btn-outline">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Real-Time Activity Timeline -->
+  <div class="gp-card" style="margin-bottom: 0;">
+    <div class="gp-card-header">
+      <span class="gp-card-title">Recent Audit Timeline</span>
+      <a href="{{ url_for('admin.audit_logs') }}" style="font-size: 12px; color: var(--info);">Audit Log →</a>
+    </div>
+    <div class="gp-card-body" style="max-height: 380px; overflow-y: auto;">
+      <div class="timeline">
+        {% for act in recent_activities %}
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-time">{{ act.timestamp.strftime('%H:%M • %d %b') }}</div>
+          <div class="timeline-content">
+            <strong>{{ act.action }}</strong><br/>
+            <span style="font-size: 11.5px; color: var(--text-muted);">{{ act.entity_type }}: {{ act.entity_id or '' }} ({{ act.user_role }})</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const weeks = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'];
+  const waitTimes = [16.4, 15.8, 15.1, 14.3, 13.6, 12.8, 12.2, 11.7, 11.2, 11.0, 10.9, 10.8];
+  
+  GovChart.drawLineTrend('kpi-trend-chart', weeks, waitTimes, 11.0, 'min', '#1e3a8a');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Startup Applications - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Applications</span>
+    </div>
+    <h1 class="page-title">Startup Applications & Proposals</h1>
+    <p class="page-subtitle">Track proposal submissions, eligibility checks, scoring, and pilot selections.</p>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>App Code</th>
+          <th>Candidate Startup</th>
+          <th>Challenge</th>
+          <th>TRL Level</th>
+          <th>Eligibility</th>
+          <th>Expert Score</th>
+          <th>Workflow Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if applications %}
+          {% for app in applications %}
+          <tr>
+            <td><code>{{ app.code }}</code></td>
+            <td><strong>{{ app.startup.name }}</strong></td>
+            <td>
+              <a href="{{ url_for('challenge.view', id=app.challenge.id) }}" style="color: var(--primary);">
+                {{ app.challenge.title[:36] }}...
+              </a>
+            </td>
+            <td><span class="badge badge-info">{{ app.product_readiness_trl }}</span></td>
+            <td>
+              {% if app.eligibility_status == 'verified' %}
+                <span class="badge badge-success">✓ Verified</span>
+              {% elif app.eligibility_status == 'flagged' %}
+                <span class="badge badge-danger">⚠ Flagged</span>
+              {% else %}
+                <span class="badge badge-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if app.average_score > 0 %}
+                <strong style="color: var(--primary);">{{ app.average_score }} / 100</strong>
+              {% else %}
+                <span style="color: var(--text-muted); font-size: 11.5px;">Pending scoring</span>
+              {% endif %}
+            </td>
+            <td><span class="badge {{ app.get_status_badge_class() }}">{{ app.status.replace('_', ' ').title() }}</span></td>
+            <td>
+              <a href="{{ url_for('application.view', id=app.id) }}" class="btn btn-sm btn-outline">
+                Inspect Proposal →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No applications recorded.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

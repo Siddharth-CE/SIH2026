@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ startup.name }} - Startup Innovation Passport{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('startup.index') }}">Startups</a>
+      <span>/</span>
+      <span>{{ startup.name }}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
+      <span class="badge badge-success" style="font-size: 13px; padding: 4px 10px;">✓ Verified Innovation Passport</span>
+      <span class="badge badge-info">{{ startup.trl_level }}</span>
+    </div>
+    <h1 class="page-title" style="margin-top: 6px;">{{ startup.name }}</h1>
+    <p class="page-subtitle">{{ startup.legal_name or startup.name }} • Registration: {{ startup.registration_number or 'Reg# Available' }}</p>
+  </div>
+
+  <div style="display: flex; gap: 10px;">
+    {% if current_user.is_authenticated and (current_user.startup_id == startup.id or current_user.is_admin) %}
+    <a href="{{ url_for('startup.edit_passport') }}" class="btn btn-outline">
+      Edit Passport
+    </a>
+    {% endif %}
+    <a href="{{ url_for('challenge.index') }}" class="btn btn-primary">
+      Match with Challenges →
+    </a>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+  <!-- Left Column -->
+  <div>
+    <!-- Section 1: Company Profile -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">1. Corporate Identification & Founders</span>
+      </div>
+      <div class="gp-card-body">
+        <p style="font-size: 13.5px; color: var(--text-main); margin-bottom: 16px; line-height: 1.6;">
+          {{ startup.summary or 'Dedicated deep-tech startup specialized in municipal and public sector innovations.' }}
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px;">
+          <div><strong>DPIIT Recognition:</strong> <code>{{ startup.startup_recognition_number or 'DPIIT-REC-2022-84910' }}</code></div>
+          <div><strong>Founded Year:</strong> {{ startup.founded_year or 2022 }} (HQ: {{ startup.headquarters }})</div>
+          <div><strong>Team Size:</strong> {{ startup.employee_count }} Full-time</div>
+          <div><strong>Founders:</strong> {{ startup.founders or 'Founding Team' }}</div>
+          <div><strong>Website:</strong> <a href="{{ startup.website or '#' }}" target="_blank">{{ startup.website or 'https://startup.demo' }}</a></div>
+          <div><strong>Contact:</strong> {{ startup.contact_email or 'contact@startup.demo' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Technology Stack & Architecture -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">2. Proprietary Technology & Product Architecture</span>
+      </div>
+      <div class="gp-card-body">
+        <h3 style="font-size: 15px; color: var(--primary); margin-bottom: 6px;">{{ startup.product_name or 'Core Innovation System' }}</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6;">
+          {{ startup.product_description or 'Specialized machine learning and edge telemetry solution engineered for public service deployments.' }}
+        </p>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 14px; font-size: 12.5px; line-height: 1.7; margin-bottom: 14px;">
+          <div><strong>Core Technology:</strong> {{ startup.core_technology }}</div>
+          <div><strong>Deployment Model:</strong> {{ startup.deployment_model }}</div>
+          <div><strong>Architecture Overview:</strong> {{ startup.architecture_overview or 'Hybrid Cloud / On-premise microservices architecture with encrypted API channels.' }}</div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          {% for cap in startup.get_capabilities_list() %}
+          <span class="badge badge-published">{{ cap }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Past Deployments -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">3. Past Deployments & Track Record</span>
+        <span class="badge badge-info">{{ startup.deployments|length }} Documented</span>
+      </div>
+      <div class="gp-card-body">
+        {% if startup.deployments %}
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            {% for d in startup.deployments %}
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                <strong style="color: var(--primary); font-size: 14px;">{{ d.project_title }}</strong>
+                <span class="badge badge-secondary">{{ d.year }}</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">
+                <strong>Client:</strong> {{ d.client_name }} ({{ d.client_type }}) • Scale: {{ d.scale }}
+              </div>
+              <div style="font-size: 12.5px; color: var(--text-main); line-height: 1.5;">
+                {{ d.outcome_summary }}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="color: var(--text-muted); font-size: 13px;">No past public deployments recorded yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Trust, Compliance & IP -->
+  <div>
+    <!-- Trust & Compliance -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">Trust & Compliance</span>
+        <span class="badge badge-success">Verified</span>
+      </div>
+      <div class="gp-card-body">
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px;">
+          <div style="padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+            <strong style="color: var(--success);">✓ Cybersecurity Certification</strong>
+            <div style="font-size: 11.5px; color: var(--text-muted);">{{ startup.cybersecurity_standard }}</div>
+          </div>
+          <div style="padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+            <strong style="color: var(--success);">✓ IP Ownership Clearance</strong>
+            <div style="font-size: 11.5px; color: var(--text-muted);">{{ startup.ip_details or '100% proprietary source code & algorithm clearance.' }}</div>
+          </div>
+          <div style="padding: 8px 10px; background: #f0fdf4; border-radius: 6px;">
+            <strong style="color: var(--success);">✓ Sovereign Data Localization</strong>
+            <div style="font-size: 11.5px; color: var(--text-muted);">In-country cloud storage compliance.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Official Certifications -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">Audited Certifications</span>
+      </div>
+      <div class="gp-card-body">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {% for cert in startup.certifications %}
+          <div style="padding: 8px 10px; background: #f8fafc; border-radius: 6px; font-size: 12px; border-left: 3px solid var(--info);">
+            <strong style="color: var(--primary);">{{ cert.name }}</strong>
+            <div style="color: var(--text-muted); font-size: 11px;">Issued by {{ cert.issuing_body }} (Valid: {{ cert.valid_until }})</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Pilots History -->
+    <div class="gp-card">
+      <div class="gp-card-header">
+        <span class="gp-card-title">GovPilot Sandbox History</span>
+      </div>
+      <div class="gp-card-body">
+        {% if startup.pilots %}
+          {% for p in startup.pilots %}
+          <div style="padding: 8px 10px; background: #f8fafc; border-radius: 6px; font-size: 12px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between;">
+              <code>{{ p.code }}</code>
+              <span class="badge {{ p.get_status_badge_class() }}">{{ p.status.title() }}</span>
+            </div>
+            <strong style="color: var(--primary); display: block; margin-top: 4px;">{{ p.title }}</strong>
+            <a href="{{ url_for('pilot.passport', id=p.id) }}" style="font-size: 11px; color: var(--info);">Open Pilot Dossier →</a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="font-size: 12px; color: var(--text-muted);">No completed sandboxes yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

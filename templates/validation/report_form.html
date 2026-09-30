@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Validation Report - {{ pilot.code }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('validation.index') }}">Validation</a>
+      <span>/</span>
+      <span>Report for {{ pilot.code }}</span>
+    </div>
+    <h1 class="page-title">Independent Validation Dossier Submission</h1>
+    <p class="page-subtitle">{{ pilot.code }}: {{ pilot.title }} • Partner: {{ pilot.startup.name }}</p>
+  </div>
+</div>
+
+<div class="gp-card" style="max-width: 900px;">
+  <form action="{{ url_for('validation.create_report', pilot_id=pilot.id) }}" method="POST">
+    <div class="gp-card-body" style="padding: 28px;">
+      
+      <div class="form-group">
+        <label class="form-label">Audit & Verification Methodology <span class="required">*</span></label>
+        <textarea name="methodology_reviewed" class="form-control" required placeholder="Describe data sources cross-referenced (e.g. raw GPS packet stream archives, automated timestamp logs, physical survey sample checks)...">{{ report.methodology_reviewed if report else 'Independent verification conducted via cross-referencing raw AIS-140 GPS packet stream archives, automated timestamp logs, and physical passenger survey ground truth audits at 8 terminal bus stops.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Evidence Sufficiency Rating</label>
+        <select name="evidence_sufficiency" class="form-control">
+          <option value="High / Sufficient" {% if report and report.evidence_sufficiency == 'High / Sufficient' %}selected{% endif %}>High / Sufficient (Primary telemetry & log proof verified)</option>
+          <option value="Moderate / Partial" {% if report and report.evidence_sufficiency == 'Moderate / Partial' %}selected{% endif %}>Moderate / Partial (Some secondary estimation used)</option>
+          <option value="Insufficient" {% if report and report.evidence_sufficiency == 'Insufficient' %}selected{% endif %}>Insufficient (Data gaps exist)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quantitative KPI Verification Summary <span class="required">*</span></label>
+        <textarea name="kpi_verification_summary" class="form-control" required placeholder="Breakdown verified metrics against pilot baseline and targets...">{{ report.kpi_verification_summary if report else 'All 4 target KPIs verified against primary telemetry sources. Average waiting time dropped from 16.4 min to 10.8 min (-34.1%). ETA accuracy achieved 94.2%. Headway regularity achieved 89.6%. Telemetry uptime logged at 99.9%.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Operational Observations & Stability</label>
+        <textarea name="observations" class="form-control" placeholder="Observations regarding driver compliance, latency, edge uptime...">{{ report.observations if report else 'The solution demonstrated exceptional stability in extreme urban traffic conditions. Driver compliance was high (88%+ adherence). Telemetry processing latency remained consistently under 1.4 seconds. Zero privacy or security vulnerabilities discovered.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Known Scale Limitations</label>
+        <textarea name="limitations" class="form-control" placeholder="Limitations to address during pan-city procurement rollout...">{{ report.limitations if report else 'Pilot was executed across 10 buses and 5 corridors. Pan-city deployment (250+ buses) will require provisioning additional cloud ingestion worker nodes.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Overall Audit Conclusion <span class="required">*</span></label>
+        <textarea name="conclusion" class="form-control" required placeholder="Final verdict on technological maturity and operational viability...">{{ report.conclusion if report else 'The pilot has conclusively demonstrated technological maturity (TRL 8), operational viability, and quantifiable commuter benefit. The solution meets all technical and security criteria for transition to formal statutory procurement.' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Scale Recommendation</label>
+        <select name="scale_recommendation" class="form-control">
+          <option value="Recommend Scale-Up Pathway" {% if report and report.scale_recommendation == 'Recommend Scale-Up Pathway' %}selected{% endif %}>Recommend Scale-Up Pathway</option>
+          <option value="Recommend Pilot Extension" {% if report and report.scale_recommendation == 'Recommend Pilot Extension' %}selected{% endif %}>Recommend Pilot Extension</option>
+          <option value="Recommend Re-testing with Modifications" {% if report and report.scale_recommendation == 'Recommend Re-testing with Modifications' %}selected{% endif %}>Recommend Re-testing with Modifications</option>
+          <option value="Recommend Closure" {% if report and report.scale_recommendation == 'Recommend Closure' %}selected{% endif %}>Recommend Closure</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 18px;">
+        <a href="{{ url_for('pilot.passport', id=pilot.id) }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-accent btn-lg">Submit Official Validation Dossier</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

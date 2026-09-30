@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Pilot - {{ challenge.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <a href="{{ url_for('challenge.index') }}">Challenges</a>
+      <span>/</span>
+      <span>Apply</span>
+    </div>
+    <h1 class="page-title">Submit Pilot Proposal</h1>
+    <p class="page-subtitle">{{ challenge.code }}: {{ challenge.title }}</p>
+  </div>
+</div>
+
+<!-- Eligibility Pre-Check Alert -->
+<div class="gp-card" style="background: #f0fdf4; border-color: #bbf7d0; margin-bottom: 20px;">
+  <div class="gp-card-body" style="padding: 16px 20px;">
+    <strong style="color: var(--success); font-size: 13.5px;">✓ Startup Eligibility Pre-Screening Passed</strong>
+    <p style="font-size: 12.5px; color: #166534; margin: 4px 0 0;">
+      Applying as <strong>{{ startup.name }}</strong> (DPIIT Rec: <code>{{ startup.startup_recognition_number or 'Verified' }}</code>, {{ startup.trl_level }}). Your Innovation Passport credentials will be automatically attached to this submission.
+    </p>
+  </div>
+</div>
+
+<!-- Application Wizard Form -->
+<div class="gp-card" id="application-wizard">
+  <div class="wizard-steps">
+    <div class="wizard-step-item active">1. Solution</div>
+    <div class="wizard-step-item">2. Problem Alignment</div>
+    <div class="wizard-step-item">3. Technical Approach</div>
+    <div class="wizard-step-item">4. Scope & Plan</div>
+    <div class="wizard-step-item">5. Outcomes & KPIs</div>
+    <div class="wizard-step-item">6. Budget</div>
+    <div class="wizard-step-item">7. Submit</div>
+  </div>
+
+  <form action="{{ url_for('application.apply', challenge_id=challenge.id) }}" method="POST">
+    <div class="gp-card-body" style="padding: 28px;">
+      
+      <!-- Step 1: Solution -->
+      <div class="wizard-step-content" style="display: block;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 1 — Solution Overview</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Introduce your proposed product and its technological readiness.</p>
+
+        <div class="form-group">
+          <label class="form-label">Solution Title <span class="required">*</span></label>
+          <input type="text" name="solution_title" class="form-control" placeholder="e.g. PulseTransit: Edge Telemetry Ingestion & Dynamic Headway Synchronization" required value="{{ startup.product_name }}: Solution Proposal">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Technology Readiness Level (TRL)</label>
+          <select name="product_readiness_trl" class="form-control">
+            <option value="TRL 7 - System Prototype Demonstration" selected>TRL 7 - System Prototype Demonstration</option>
+            <option value="TRL 8 - System Complete and Qualified">TRL 8 - System Complete and Qualified</option>
+            <option value="TRL 9 - Proven in Operational Environment">TRL 9 - Proven in Operational Environment</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Solution Executive Summary <span class="required">*</span></label>
+          <textarea name="solution_summary" class="form-control" placeholder="Explain how your solution operates in a sandbox deployment..." required>{{ startup.product_description }}</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-primary btn-next-step">Next: Problem Alignment →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Problem Alignment -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 2 — Problem Alignment</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Describe how your solution directly resolves the department's pain points.</p>
+
+        <div class="form-group">
+          <label class="form-label">Addressing the Operational Challenge <span class="required">*</span></label>
+          <textarea name="problem_alignment" class="form-control" placeholder="Directly address the department's baseline bottlenecks..." required>Our proprietary solution tackles this bottleneck by replacing static timetables with dynamic real-time predictive synchronization.</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Technical Approach →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Technical Approach -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 3 — Technical Approach & Data Architecture</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Detail algorithms, integration protocols, and data protection.</p>
+
+        <div class="form-group">
+          <label class="form-label">Technical & Algorithmic Approach <span class="required">*</span></label>
+          <textarea name="technical_approach" class="form-control" placeholder="Describe data ingestion, machine learning models, and edge processing..." required>1. Ingest GPS bursts via TLS encrypted broker.
+2. Predict segment speeds with real-time signal cycle weights.
+3. Push dynamic holding advisories to depot screens and live ETA feeds to commuter apps.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Data Governance & Privacy Protection</label>
+          <textarea name="data_governance_plan" class="form-control" placeholder="Explain redaction, data localization, and encryption...">All data encrypted in transit (TLS 1.3) and at rest. No citizen PII stored. Anonymized spatial logs only.</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Scope & Plan →</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Scope & Plan -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 4 — Implementation Timeline & Resources</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Breakdown the 90-day sandbox execution schedule.</p>
+
+        <div class="form-group">
+          <label class="form-label">Implementation Plan</label>
+          <textarea name="implementation_plan" class="form-control" placeholder="Breakdown by weeks...">Week 1-2: API handshake with Transport Command Center.
+Week 3-4: Onboard 10 test buses across 5 corridors.
+Week 5-8: Model training and driver advisory calibration.
+Week 9-12: Public ETA feed broadcast and final KPI validation.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Departmental Resources Required</label>
+          <input type="text" name="resource_requirements" class="form-control" placeholder="e.g. Sandbox API access to 10 bus telemetry feeds and depot monitor terminal." value="Sandbox telemetry stream access and depot dispatch monitor terminal.">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Outcomes & KPIs →</button>
+        </div>
+      </div>
+
+      <!-- Step 5: Outcomes & KPIs -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 5 — Expected Outcomes & Proposed KPIs</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Commit to measurable success targets.</p>
+
+        <div class="form-group">
+          <label class="form-label">Expected Pilot Outcomes</label>
+          <textarea name="expected_outcomes" class="form-control" placeholder="Quantifiable impact...">Demonstrate >30% reduction in passenger wait times and >92% real-time arrival accuracy.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Committed KPIs</label>
+          <textarea name="proposed_kpis" class="form-control" placeholder="List KPIs...">1. Passenger Waiting Time (<11 min)
+2. ETA Accuracy (>92%)
+3. Headway Regularity (>85%)
+4. Telemetry Uptime (>99.5%)</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Budget →</button>
+        </div>
+      </div>
+
+      <!-- Step 6: Budget -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 6 — Budget Envelope & Milestone Split</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Provide commercial cost structure aligned with pilot envelope.</p>
+
+        <div class="form-group">
+          <label class="form-label">Total Proposed Pilot Cost</label>
+          <input type="text" name="budget_total" class="form-control" value="{{ challenge.budget_indicative or '₹10,00,000' }}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Milestone Breakdown</label>
+          <textarea name="budget_breakdown" class="form-control">Milestone 1 (25%): Telemetry Integration & Fleet Onboarding (₹2,50,000)
+Milestone 2 (25%): Headway Model Calibration (₹2,50,000)
+Milestone 3 (25%): Public GTFS-RT Broadcast (₹2,50,000)
+Milestone 4 (25%): Final Validation & Scale Dossier (₹2,50,000)</textarea>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Previous</button>
+          <button type="button" class="btn btn-primary btn-next-step">Next: Review & Submit →</button>
+        </div>
+      </div>
+
+      <!-- Step 7: Submit -->
+      <div class="wizard-step-content" style="display: none;">
+        <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 6px;">Step 7 — Compliance Declaration & Submission</h3>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 20px;">Confirm legal warranties and submit proposal for automated screening.</p>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.6;">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 12px;">
+            <input type="checkbox" required checked style="margin-top: 4px;">
+            <span>I certify that all technical specifications, DPIIT credentials, and IP declarations provided in this proposal are accurate and genuine.</span>
+          </label>
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+            <input type="checkbox" required checked style="margin-top: 4px;">
+            <span>I agree to participate in the controlled sandbox pilot under the GovPilot innovation testing guidelines and statutory disclaimer terms.</span>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn btn-outline btn-prev-step">← Back</button>
+          <button type="submit" class="btn btn-accent btn-lg">🚀 Submit Proposal for Pilot Screening</button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/wizard.js') }}"></script>
+{% endblock %}

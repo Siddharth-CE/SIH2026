@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Independent Technical Validation - GovPilot{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.index') }}">Home</a>
+      <span>/</span>
+      <span>Validation</span>
+    </div>
+    <h1 class="page-title">Independent Validation Cell</h1>
+    <p class="page-subtitle">Third-party evidence inspection, raw telemetry audits, and scale readiness certification.</p>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-card-header">
+    <span class="gp-card-title">Completed Validation Reports</span>
+  </div>
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Report Code</th>
+          <th>Pilot</th>
+          <th>Lead Validator</th>
+          <th>Evidence Sufficiency</th>
+          <th>Recommendation</th>
+          <th>Date Submitted</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if reports %}
+          {% for r in reports %}
+          <tr>
+            <td><code>{{ r.report_code }}</code></td>
+            <td><strong>{{ r.pilot.code }}</strong> ({{ r.pilot.title[:30] }}...)</td>
+            <td>{{ r.validator.name if r.validator else 'Validation Cell' }}</td>
+            <td><span class="badge badge-success">{{ r.evidence_sufficiency }}</span></td>
+            <td><span class="badge badge-scale">{{ r.scale_recommendation }}</span></td>
+            <td>{{ r.submitted_at.strftime('%d %b %Y') }}</td>
+            <td>
+              <a href="{{ url_for('pilot.passport', id=r.pilot_id, tab='decision') }}" class="btn btn-sm btn-outline">
+                Inspect Dossier →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No validation reports recorded.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

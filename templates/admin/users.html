@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - GovPilot Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="breadcrumb-trail">
+      <a href="{{ url_for('dashboard.admin_dashboard') }}">Admin</a>
+      <span>/</span>
+      <span>Users</span>
+    </div>
+    <h1 class="page-title">User & Role Governance</h1>
+    <p class="page-subtitle">Manage role-based authentication across Government, Startup, Evaluator, and Validator accounts.</p>
+  </div>
+</div>
+
+<div class="gp-card">
+  <div class="gp-table-container">
+    <table class="gp-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email Address</th>
+          <th>Role</th>
+          <th>Title / Department / Startup</th>
+          <th>Created</th>
+          <th>Last Active</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td><strong>{{ u.name }}</strong></td>
+          <td>{{ u.email }}</td>
+          <td><span class="badge {{ u.get_role_badge_class() }}">{{ u.role.title() }}</span></td>
+          <td>
+            {% if u.is_government and u.department %}
+              {{ u.title }} • {{ u.department.name }}
+            {% elif u.is_startup and u.startup %}
+              {{ u.title }} • {{ u.startup.name }}
+            {% else %}
+              {{ u.title or 'Platform User' }}
+            {% endif %}
+          </td>
+          <td>{{ u.created_at.strftime('%d %b %Y') }}</td>
+          <td>{{ u.last_login.strftime('%d %b %H:%M') if u.last_login else 'Active' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
